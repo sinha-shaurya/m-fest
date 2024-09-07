@@ -54,12 +54,11 @@ class SignUp extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Password Field
                 TextField(
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: "Enter Your Password",
-                    suffixIcon: Icon(Icons.visibility_off),
+                    suffixIcon: const Icon(Icons.visibility_off),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
