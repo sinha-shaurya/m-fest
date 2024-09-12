@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../widgets/auth/custom_button.dart';
+import '../../widgets/auth/custom_text_field.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -20,27 +22,17 @@ class Login extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 // Email Field
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "example@gmail.com",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
+                const CustomTextField(
+                  label: "Email",
+                  hint: "example@gmail.com",
                 ),
                 const SizedBox(height: 16),
                 // Password Field
-                TextField(
+                const CustomTextField(
+                  label: "Password",
+                  hint: "Enter Your Password",
                   obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    hintText: "Enter Your Password",
-                    suffixIcon: const Icon(Icons.visibility_off),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
+                  suffixIcon: Icons.visibility_off,
                 ),
                 const SizedBox(height: 10),
                 // Remember Me & Forgot Password
@@ -63,19 +55,11 @@ class Login extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                // Login Button
-                ElevatedButton(
+                CustomButton(
+                  text: "Login",
                   onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: const Text("Login"),
                 ),
                 const SizedBox(height: 20),
-                // Or with Divider
                 Row(
                   children: [
                     Expanded(
@@ -97,13 +81,12 @@ class Login extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                // Google Login Button
                 ElevatedButton.icon(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       side: const BorderSide(color: Colors.black12),
@@ -111,21 +94,20 @@ class Login extends StatelessWidget {
                   ),
                   icon: Image.asset(
                     'assets/google_icon.png',
-                    height: 24,
-                    width: 24,
+                    height: 20,
+                    width: 20,
                   ),
                   label: const Text("Login with Google"),
                 ),
                 const SizedBox(height: 20),
-                // Sign Up Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account? "),
+                    const Text("Don't have an account ?"),
                     TextButton(
                       onPressed: () {},
                       child: const Text(
-                        "Sign Up",
+                        "Create",
                         style: TextStyle(color: Colors.blue),
                       ),
                     ),
