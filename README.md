@@ -34,4 +34,4 @@ lib/
 └── services/                   // External services
     ├── api/                    // API services
     ├── local_storage/          // Local storage management
-    └── notification/           // Notification services
+    └── notification/           // Notification service
