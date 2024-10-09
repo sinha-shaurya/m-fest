@@ -32,11 +32,11 @@ class CouponCard extends StatelessWidget {
                 bottomLeft: Radius.circular(15),
               ),
             ),
-            child: RotatedBox(
+            child: const RotatedBox(
               quarterTurns: 3,
               child: Text(
                 '25% OFF\nDISCOUNT',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -61,9 +61,9 @@ class CouponCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'ADMIT ONE',
                           style: TextStyle(
