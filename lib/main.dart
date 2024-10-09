@@ -3,9 +3,11 @@ import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'presentations/screens/auth/splash_screen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

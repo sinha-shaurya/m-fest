@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,7 +15,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthForgotPassword>(_onForgotPasswordEvent);
     on<AuthResetPassword>(_onResetPasswordEvent);
   }
-  final String baseUrl = 'http://10.0.2.2:5000';
+  final String baseUrl =
+      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
 
   Future<void> _onLoginEvent(AuthLogin event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
