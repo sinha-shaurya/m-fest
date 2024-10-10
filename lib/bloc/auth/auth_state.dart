@@ -13,6 +13,10 @@ class AuthSuccess extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class AuthRegistered extends AuthState {}
+
+class AuthLogout extends AuthState {}
+
 class AuthIncomplete extends AuthState {
   final String name;
 
