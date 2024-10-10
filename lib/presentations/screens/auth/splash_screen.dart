@@ -2,6 +2,7 @@ import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
+import 'package:aash_india/presentations/screens/home/complete_profile.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +29,15 @@ class SplashScreenState extends State<SplashScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const HomePage()),
+          );
+        } else if (state is AuthIncomplete) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CompleteProfile(
+                      isCustomer: state.isCustomer,
+                      name: state.name,
+                    )),
           );
         } else if (state is AuthFailed) {
           Navigator.pushReplacement(

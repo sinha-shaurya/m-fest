@@ -54,3 +54,12 @@ class AuthResetPassword extends AuthEvent {
 }
 
 class AuthCheck extends AuthEvent {}
+
+class AuthCompleteProfile extends AuthEvent {
+  final Map<String, dynamic> data;
+
+  const AuthCompleteProfile(this.data);
+
+  @override
+  List<Object> get props => [data];
+}
