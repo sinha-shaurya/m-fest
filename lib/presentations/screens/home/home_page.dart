@@ -2,6 +2,8 @@ import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/bloc/navigation/navigation_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/profile/profile_page.dart';
+import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +18,6 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: const Text("Aash India App"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-        ],
         backgroundColor: appTheme(context).primaryColor,
       ),
       body: BlocBuilder<NavigationBloc, NavigationState>(
@@ -58,11 +50,11 @@ class HomePage extends StatelessWidget {
               ),
             );
           } else if (state is NavigationCategories) {
-            return const Center(child: Text('Categories Page'));
+            return SponsorPage();
           } else if (state is NavigationFavorites) {
             return const Center(child: Text('Favorites Page'));
           } else if (state is NavigationProfile) {
-            return const Center(child: Text('Profile Page'));
+            return ProfilePage();
           }
           return Container();
         },
@@ -80,12 +72,12 @@ class HomePage extends StatelessWidget {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.category),
-                label: 'Categories',
+                icon: Icon(Icons.pages),
+                label: 'Sponsors',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
-                label: 'Favorites',
+                icon: Icon(Icons.topic),
+                label: 'Coupons',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),

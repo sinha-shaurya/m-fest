@@ -28,7 +28,7 @@ class _SignUpState extends State<SignUp> {
             content: Text(state.message),
             backgroundColor: AppColors.errorColor,
           ));
-        } else if (state is AuthSuccess) {
+        } else if (state is AuthRegistered) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Successfully registered.'),
             backgroundColor: Colors.green,
