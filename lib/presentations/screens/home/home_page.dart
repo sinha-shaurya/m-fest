@@ -1,3 +1,6 @@
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_event.dart';
+import 'package:aash_india/bloc/coupons/coupon_state.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/bloc/navigation/navigation_state.dart';
@@ -6,11 +9,23 @@ import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
+import 'package:aash_india/presentations/widgets/image_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +42,7 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ImageCarousel(),
                   const SizedBox(height: 10),
                   SizedBox(
                     height: 60,
@@ -35,6 +51,8 @@ class HomePage extends StatelessWidget {
                       children: const [
                         CategoryItem(name: 'Fashion', icon: Icons.shopping_bag),
                         CategoryItem(name: 'Clothes', icon: Icons.woman),
+                        CategoryItem(
+                            name: 'Footwear', icon: Icons.snowshoeing_sharp),
                         CategoryItem(name: 'Electronics', icon: Icons.devices),
                       ],
                     ),
@@ -42,8 +60,27 @@ class HomePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: List.generate(5, (index) => const CouponCard()),
+                    child: BlocBuilder<CouponBloc, CouponState>(
+                      builder: (context, state) {
+                        if (state is CouponLoaded) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: state.coupons.length,
+                            itemBuilder: (context, index) {
+                              return CouponCard(
+                                title: state.coupons[index]['title'],
+                                active: state.coupons[index]['active'],
+                                discountPercent: state.coupons[index]
+                                    ['discountPercentage'],
+                              );
+                            },
+                          );
+                        }
+                        return CircularProgressIndicator(
+                          backgroundColor: AppColors.primaryColor,
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -52,7 +89,8 @@ class HomePage extends StatelessWidget {
           } else if (state is NavigationCategories) {
             return SponsorPage();
           } else if (state is NavigationFavorites) {
-            return const Center(child: Text('Favorites Page'));
+            return const Center(
+                child: Text('You have not added any coupon yet !'));
           } else if (state is NavigationProfile) {
             return ProfilePage();
           }
