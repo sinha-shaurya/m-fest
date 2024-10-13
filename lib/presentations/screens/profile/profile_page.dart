@@ -18,11 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  @override
-  void initState() {
-    super.initState();
-    BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
-  }
+  bool isOtherCategory = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +68,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(height: 20),
                     _buildInfoSection(
-                      title: 'Address Information',
+                      title: state.type == 'customer'
+                          ? 'Address Information'
+                          : 'Shop Information',
                       content: [
+                        state.type == 'partner'
+                            ? InfoTile(
+                                label: 'Name',
+                                value: state.shopName ?? "",
+                                icon: Icons.shop,
+                              )
+                            : SizedBox(),
+                        state.type == 'partner'
+                            ? InfoTile(
+                                label: 'Category',
+                                value: state.shopCategory ?? "",
+                                icon: Icons.category,
+                              )
+                            : SizedBox(),
                         InfoTile(
                           label: 'City',
                           value: state.city,
@@ -91,7 +103,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       onEditPressed: () {
-                        _showEditAddressDialog(context, state);
+                        state.type == 'customer'
+                            ? _showEditAddressDialog(context, state)
+                            : _showEditShopInfoDialog(context, state);
                       },
                     ),
                     const SizedBox(height: 20),
@@ -376,6 +390,150 @@ class _ProfilePageState extends State<ProfilePage> {
                     "gender": state.gender,
                     "state": updatedState,
                     "pincode": updatedPincode,
+                  }));
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("* All fields are required"),
+                    backgroundColor: AppColors.errorColor,
+                  ));
+                }
+              },
+              child: const Text(
+                'Save',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditShopInfoDialog(BuildContext context, ProfileFetched state) {
+    String updatedShopName = state.shopName ?? "";
+    String updatedCategory = state.shopCategory ?? "";
+    String updatedCity = state.city;
+    String updatedState = state.state;
+    String updatedPincode = state.pincode;
+
+    isOtherCategory = updatedCategory.toLowerCase() == 'others';
+    TextEditingController categoryController =
+        TextEditingController(text: isOtherCategory ? updatedCategory : '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          title: const Text('Edit Shop Information'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  initialValue: state.shopName,
+                  onChanged: (val) {
+                    updatedShopName = val;
+                  },
+                  decoration: const InputDecoration(labelText: 'Shop Name'),
+                ),
+                const SizedBox(height: 12),
+
+                // Shop Category field with dropdown
+                DropdownButtonFormField<String>(
+                  value: isOtherCategory ? 'Others' : updatedCategory,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  items: const [
+                    DropdownMenuItem(
+                        value: 'Electronics', child: Text('Electronics')),
+                    DropdownMenuItem(value: 'Clothes', child: Text('Clothes')),
+                    DropdownMenuItem(
+                        value: 'Home Appliances',
+                        child: Text('Home Appliances')),
+                    DropdownMenuItem(value: 'Others', child: Text('Others')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      updatedCategory = value ?? "";
+                      if (value == 'Others') {
+                        isOtherCategory = true;
+                      } else {
+                        isOtherCategory = false;
+                        updatedCategory = value!;
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Show custom category text field if 'Others' is selected
+                isOtherCategory
+                    ? TextFormField(
+                        controller: categoryController,
+                        onChanged: (val) {
+                          updatedCategory = val;
+                        },
+                        decoration:
+                            const InputDecoration(labelText: 'Enter Category'),
+                      )
+                    : const SizedBox(),
+
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: state.city,
+                  onChanged: (val) {
+                    updatedCity = val;
+                  },
+                  decoration: const InputDecoration(labelText: 'City'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: state.state,
+                  onChanged: (val) {
+                    updatedState = val;
+                  },
+                  decoration: const InputDecoration(labelText: 'State'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: state.pincode,
+                  onChanged: (val) {
+                    updatedPincode = val;
+                  },
+                  decoration: const InputDecoration(labelText: 'Pincode'),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (updatedShopName.isNotEmpty &&
+                    updatedCategory.isNotEmpty &&
+                    updatedCity.isNotEmpty &&
+                    updatedState.isNotEmpty &&
+                    updatedPincode.isNotEmpty) {
+                  BlocProvider.of<ProfileBloc>(context).add(ProfileUpdateInfo({
+                    "firstname": state.fname,
+                    "lastname": state.lname,
+                    "phonenumber": state.phone,
+                    "shop_name": updatedShopName,
+                    "shop_category": updatedCategory,
+                    "shop_city": updatedCity,
+                    "shop_state": updatedState,
+                    "shop_pincode": updatedPincode,
+                    "gender": state.gender,
                   }));
                   Navigator.pop(context);
                 } else {

@@ -4,7 +4,12 @@ import 'package:aash_india/bloc/coupons/coupon_state.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/bloc/navigation/navigation_state.dart';
+import 'package:aash_india/bloc/profile/profile_bloc.dart';
+import 'package:aash_india/bloc/profile/profile_event.dart';
+import 'package:aash_india/bloc/profile/profile_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/coupon/coupons.dart';
+import 'package:aash_india/presentations/screens/coupon/create_coupon.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
@@ -24,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+    BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
     super.initState();
   }
 
@@ -88,9 +94,18 @@ class _HomePageState extends State<HomePage> {
             );
           } else if (state is NavigationCategories) {
             return SponsorPage();
-          } else if (state is NavigationFavorites) {
-            return const Center(
-                child: Text('You have not added any coupon yet !'));
+          } else if (state is NavigationCoupon) {
+            return BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileFetched) {
+                  if (state.type == 'customer') return Coupons();
+                  return CreateCoupon();
+                }
+                return const Center(
+                  child: Text('Error Fetching'),
+                );
+              },
+            );
           } else if (state is NavigationProfile) {
             return ProfilePage();
           }
@@ -134,7 +149,7 @@ class _HomePageState extends State<HomePage> {
   int _getSelectedIndex(NavigationState state) {
     if (state is NavigationHome) return 0;
     if (state is NavigationCategories) return 1;
-    if (state is NavigationFavorites) return 2;
+    if (state is NavigationCoupon) return 2;
     if (state is NavigationProfile) return 3;
     return 0;
   }
