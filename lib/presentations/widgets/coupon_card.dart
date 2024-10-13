@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+
 class CouponCard extends StatelessWidget {
-  const CouponCard({super.key});
+  final int discountPercent;
+  final String title;
+  final bool active;
+  const CouponCard(
+      {required this.title,
+      this.active = true,
+      required this.discountPercent,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16.0),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15.0),
@@ -21,21 +29,20 @@ class CouponCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Left Section
           Container(
             width: 80,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF880E4F), // Maroon Color
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: active ? Color(0xFF880E4F) : Colors.grey.shade700,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(15),
                 bottomLeft: Radius.circular(15),
               ),
             ),
-            child: const RotatedBox(
+            child: RotatedBox(
               quarterTurns: 3,
               child: Text(
-                '25% OFF\nDISCOUNT',
+                '$discountPercent% OFF\nDISCOUNT',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -45,17 +52,16 @@ class CouponCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Middle Section
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'COUPON',
+                Text(
+                  title,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF880E4F), // Maroon Color
+                    color: active ? Color(0xFF880E4F) : Colors.grey.shade700,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -92,7 +98,9 @@ class CouponCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 16.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF880E4F), // Maroon Color
+                        color: active
+                            ? Color(0xFF880E4F)
+                            : Colors.grey.shade700, // Maroon Color
                         borderRadius: BorderRadius.circular(5.0),
                       ),
                       child: const Text(

@@ -1,4 +1,5 @@
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/core/constants/theme.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<NavigationBloc>(create: (context) => NavigationBloc()),
         BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
         BlocProvider<ProfileBloc>(create: (context) => ProfileBloc()),
+        BlocProvider<CouponBloc>(create: (context) => CouponBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
