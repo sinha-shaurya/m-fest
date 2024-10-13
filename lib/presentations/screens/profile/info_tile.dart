@@ -20,9 +20,12 @@ class InfoTile extends StatelessWidget {
             label,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
           ),
-          trailing: Text(
-            value,
-            style: const TextStyle(fontSize: 18),
+          trailing: SizedBox(
+            width: 150,
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 18),
+            ),
           ),
         ),
         const Divider(),

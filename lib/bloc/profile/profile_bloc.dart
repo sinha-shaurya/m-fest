@@ -13,7 +13,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
   final String baseUrl =
       dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
-
   Future<void> _onProfileFetch(
       ProfileFetchInfo event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
@@ -32,14 +31,34 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         if (response.statusCode == 200) {
           final res = jsonDecode(response.body);
 
-          emit(ProfileFetched(
+          final userType = res['type'];
+          if (userType == 'partner') {
+            emit(ProfileFetched(
+              fname: res['data']['firstname'] ?? "",
+              lname: res['data']['lastname'] ?? "",
+              phone: res['data']['phonenumber'] ?? "",
+              gender: res['data']['gender'] ?? "",
+              city: res['data']['shop_city'] ?? "",
+              state: res['data']['shop_state'] ?? "",
+              pincode: res['data']['shop_pincode'] ?? "",
+              shopName: res['data']['shop_name'] ?? "",
+              shopCategory: res['data']['shop_category'] ?? "",
+              type: 'partner',
+            ));
+          } else if (userType == 'customer') {
+            emit(ProfileFetched(
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
               gender: res['data']['gender'] ?? "",
               city: res['data']['city'] ?? "",
               state: res['data']['state'] ?? "",
-              pincode: res['data']['pincode'] ?? ""));
+              pincode: res['data']['pincode'] ?? "",
+              type: 'customer',
+            ));
+          } else {
+            emit(ProfileFailed('User type not recognized'));
+          }
         } else {
           emit(ProfileFailed('Failed to fetch profile data'));
         }
@@ -69,14 +88,34 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         if (response.statusCode == 200) {
           final res = jsonDecode(response.body);
 
-          emit(ProfileFetched(
+          final userType = res['type'];
+          if (userType == 'partner') {
+            emit(ProfileFetched(
+              fname: res['data']['firstname'] ?? "",
+              lname: res['data']['lastname'] ?? "",
+              phone: res['data']['phonenumber'] ?? "",
+              gender: res['data']['gender'] ?? "",
+              city: res['data']['shop_city'] ?? "",
+              state: res['data']['shop_state'] ?? "",
+              pincode: res['data']['shop_pincode'] ?? "",
+              shopName: res['data']['shop_name'] ?? "",
+              shopCategory: res['data']['shop_category'] ?? "",
+              type: 'partner',
+            ));
+          } else if (userType == 'customer') {
+            emit(ProfileFetched(
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
               gender: res['data']['gender'] ?? "",
               city: res['data']['city'] ?? "",
               state: res['data']['state'] ?? "",
-              pincode: res['data']['pincode'] ?? ""));
+              pincode: res['data']['pincode'] ?? "",
+              type: 'customer',
+            ));
+          } else {
+            emit(ProfileFailed('User type not recognized'));
+          }
         } else {
           emit(ProfileFailed('Failed to fetch profile data'));
         }

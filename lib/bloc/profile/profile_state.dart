@@ -17,16 +17,31 @@ class ProfileFetched extends ProfileState {
   final String city;
   final String state;
   final String pincode;
+  final String type;
+  final String? shopName;
+  final String? shopCategory;
   const ProfileFetched(
       {required this.fname,
       required this.lname,
       required this.phone,
       required this.gender,
       required this.city,
+      this.shopCategory,
+      this.shopName,
+      required this.type,
       required this.state,
       required this.pincode});
   @override
-  List<Object> get props => [fname, lname, phone, gender, city, state, pincode];
+  List<Object> get props => [
+        fname,
+        lname,
+        phone,
+        gender,
+        city,
+        state,
+        pincode,
+        type,
+      ];
 }
 
 class ProfileLoading extends ProfileState {}

@@ -23,17 +23,13 @@ class _CompleteProfileState extends State<CompleteProfile> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
+  final TextEditingController _shopNameController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
+  String _selectedCategory = 'Electronics';
+  bool _showOtherCategoryField = false;
 
   String? _selectedGender;
   bool _isStepOne = true;
-
-  // void _autoDetectLocation() {
-  //   setState(() {
-  //     _cityController.text = "Auto-detected City";
-  //     _stateController.text = "Auto-detected State";
-  //     _zipCodeController.text = "123456";
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +75,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ),
                 const SizedBox(height: 20),
                 if (_isStepOne) _buildPersonalDetailsForm(),
-                if (!_isStepOne) _buildAddressDetailsForm(),
+                if (!_isStepOne)
+                  widget.isCustomer
+                      ? _buildAddressDetailsForm()
+                      : _buildBusinessDetailsForm(),
               ],
             ),
           ),
@@ -309,6 +308,167 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   "city": _cityController.text.trim(),
                   "state": _stateController.text.trim(),
                   "pincode": _zipCodeController.text.trim(),
+                }));
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthLoading) {
+                  return const CircularProgressIndicator();
+                }
+                return const Text(
+                  "Finish",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBusinessDetailsForm() {
+    return Container(
+      padding: const EdgeInsets.all(36),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(width: 0.25),
+      ),
+      child: Column(
+        children: [
+          TextField(
+            controller: _shopNameController,
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor)),
+              labelText: "Shop Name",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.store),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _cityController,
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor)),
+              labelText: "City",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.location_on),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _stateController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor)),
+              labelText: "State",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.location_city),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _zipCodeController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor)),
+              labelText: "Pincode",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.numbers),
+            ),
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _selectedCategory,
+            items: <String>[
+              'Electronics',
+              'Clothes',
+              'Home Appliances',
+              'Others'
+            ].map((String category) {
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Text(category),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedCategory = newValue!;
+                _showOtherCategoryField = _selectedCategory == 'Others';
+              });
+            },
+            decoration: InputDecoration(
+              labelText: "Category",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              prefixIcon: const Icon(Icons.category),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor)),
+            ),
+          ),
+          if (_showOtherCategoryField) ...[
+            const SizedBox(height: 16),
+            TextField(
+              controller: _categoryController,
+              decoration: InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.primaryColor)),
+                labelText: "Enter category",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              if (_shopNameController.text.isEmpty ||
+                  _cityController.text.isEmpty ||
+                  _stateController.text.isEmpty ||
+                  (_showOtherCategoryField &&
+                      _categoryController.text.isEmpty)) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('* All fields are required'),
+                  backgroundColor: AppColors.errorColor,
+                ));
+                return;
+              } else {
+                BlocProvider.of<AuthBloc>(context).add(AuthCompleteProfile({
+                  "firstname": _firstNameController.text.trim(),
+                  "lastname": _lastNameController.text.trim(),
+                  "gender": _selectedGender,
+                  "phonenumber": _phoneNumberController.text.trim(),
+                  "shop_name": _shopNameController.text.trim(),
+                  "shop_city": _cityController.text.trim(),
+                  "shop_state": _stateController.text.trim(),
+                  "shop_pincode": _zipCodeController.text.trim(),
+                  "shop_category": _showOtherCategoryField
+                      ? _categoryController.text.trim()
+                      : _selectedCategory,
                 }));
               }
             },
