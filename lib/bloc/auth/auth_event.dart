@@ -17,6 +17,8 @@ class AuthLogin extends AuthEvent {
   List<Object> get props => [email, password];
 }
 
+class AuthLogoutEvent extends AuthEvent {}
+
 class AuthRegister extends AuthEvent {
   final String type;
   final String name;

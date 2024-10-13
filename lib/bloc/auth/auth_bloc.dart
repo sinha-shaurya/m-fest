@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthForgotPassword>(_onForgotPasswordEvent);
     on<AuthResetPassword>(_onResetPasswordEvent);
     on<AuthCompleteProfile>(_onProfileComplete);
+    on<AuthLogoutEvent>(_onLogout);
   }
   final String baseUrl =
       dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
@@ -31,12 +32,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String token = responseData['token'];
+        final bool isProfileCompleted = responseData['isProfileCompleted'];
+        final name = responseData['name'];
+        final isCustomer = responseData['type'] == 'customer';
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
-        emit(AuthSuccess());
+        if (isProfileCompleted) {
+          emit(AuthSuccess());
+        } else {
+          emit(AuthIncomplete(name: name, isCustomer: isCustomer));
+        }
       } else {
         emit(AuthFailed('Invalid credentials'));
       }
+    } catch (error) {
+      emit(AuthFailed('Unknown error occurred.'));
+    }
+  }
+
+  Future<void> _onLogout(AuthLogoutEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      emit(AuthLogout());
     } catch (error) {
       emit(AuthFailed('Unknown error occurred.'));
     }
@@ -58,7 +77,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (response.statusCode == 201) {
-        emit(AuthSuccess());
+        emit(AuthRegistered());
       } else {
         emit(AuthFailed('Something went wrong'));
       }

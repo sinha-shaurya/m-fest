@@ -1,6 +1,7 @@
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
+import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/home/complete_profile.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
@@ -52,7 +53,9 @@ class SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              CircularProgressIndicator(),
+              CircularProgressIndicator(
+                color: AppColors.primaryColor,
+              ),
             ],
           ),
         ),
