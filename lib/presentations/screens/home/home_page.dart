@@ -2,6 +2,7 @@ import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/bloc/navigation/navigation_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/Sponsors/SponsorScreen.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class HomePage extends StatelessWidget {
               ),
             );
           } else if (state is NavigationCategories) {
-            return const Center(child: Text('Categories Page'));
+            return Sponsorscreen();
           } else if (state is NavigationFavorites) {
             return const Center(child: Text('Favorites Page'));
           } else if (state is NavigationProfile) {
@@ -80,8 +81,8 @@ class HomePage extends StatelessWidget {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.category),
-                label: 'Categories',
+                icon: Icon(Icons.link),
+                label: 'Link',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite),
