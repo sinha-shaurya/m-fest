@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primaryColor = Color(0xFF880E4F); // Maroon color
+  static const Color primaryColor = Color(0xFF880E4F);
   static const Color accentColor = Colors.amber;
-  static const Color backgroundColor = Colors.white;
+  static const Color backgroundColor = Color(0xFFF5F5F5);
   static const Color textColor = Colors.black87;
   static const Color errorColor = Colors.redAccent;
   static const Color buttonTextColor = Colors.white;
