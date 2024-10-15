@@ -18,6 +18,8 @@ class CouponLoaded extends CouponState {
   List<Object> get props => [coupons];
 }
 
+class CouponSuccess extends CouponState {}
+
 class CouponFailed extends CouponState {
   final String error;
 

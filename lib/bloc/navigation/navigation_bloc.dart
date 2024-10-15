@@ -13,7 +13,7 @@ class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
           emit(NavigationCategories());
           break;
         case 2:
-          emit(NavigationFavorites());
+          emit(NavigationCoupon());
           break;
         case 3:
           emit(NavigationProfile());

@@ -5,10 +5,10 @@ class ImageCarousel extends StatefulWidget {
   const ImageCarousel({super.key});
 
   @override
-  _ImageCarouselState createState() => _ImageCarouselState();
+  ImageCarouselState createState() => ImageCarouselState();
 }
 
-class _ImageCarouselState extends State<ImageCarousel> {
+class ImageCarouselState extends State<ImageCarousel> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   late Timer _timer;
