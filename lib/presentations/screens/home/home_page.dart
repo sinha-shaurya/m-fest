@@ -1,7 +1,14 @@
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/bloc/navigation/navigation_state.dart';
+import 'package:aash_india/bloc/profile/profile_bloc.dart';
+import 'package:aash_india/bloc/profile/profile_event.dart';
+import 'package:aash_india/bloc/profile/profile_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/coupon/coupons.dart';
+import 'package:aash_india/presentations/screens/coupon/create_coupon.dart';
+import 'package:aash_india/presentations/screens/profile/profile_page.dart';
+import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +16,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+    BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +77,19 @@ class HomePage extends StatelessWidget {
               ),
             );
           } else if (state is NavigationCategories) {
-            return const Center(child: Text('Categories Page'));
-          } else if (state is NavigationFavorites) {
-            return const Center(child: Text('Favorites Page'));
+            return SponsorPage();
+          } else if (state is NavigationCoupon) {
+            return BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileFetched) {
+                  if (state.type == 'customer') return Coupons();
+                  return CreateCoupon();
+                }
+                return const Center(
+                  child: Text('Error Fetching'),
+                );
+              },
+            );
           } else if (state is NavigationProfile) {
             return const Center(child: Text('Profile Page'));
           }
@@ -104,7 +133,7 @@ class HomePage extends StatelessWidget {
   int _getSelectedIndex(NavigationState state) {
     if (state is NavigationHome) return 0;
     if (state is NavigationCategories) return 1;
-    if (state is NavigationFavorites) return 2;
+    if (state is NavigationCoupon) return 2;
     if (state is NavigationProfile) return 3;
     return 0;
   }

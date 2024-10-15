@@ -11,6 +11,6 @@ class NavigationHome extends NavigationState {}
 
 class NavigationCategories extends NavigationState {}
 
-class NavigationFavorites extends NavigationState {}
+class NavigationCoupon extends NavigationState {}
 
 class NavigationProfile extends NavigationState {}
