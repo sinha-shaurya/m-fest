@@ -56,6 +56,9 @@ class _CreateCouponState extends State<CreateCoupon> {
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Create Coupon'),
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -119,7 +122,8 @@ class _CreateCouponState extends State<CreateCoupon> {
         _buildColorOption(
             AppColors.primaryColor, selectedColor == AppColors.primaryColor),
         _buildColorOption(Colors.red, selectedColor == Colors.red),
-        _buildColorOption(Colors.blue, selectedColor == Colors.blue),
+        _buildColorOption(
+            Color(0xFF3357FF), selectedColor == Color(0xFF3357FF)),
         _buildColorOption(Colors.green, selectedColor == Colors.green),
         _buildColorOption(Colors.orange, selectedColor == Colors.orange),
       ],

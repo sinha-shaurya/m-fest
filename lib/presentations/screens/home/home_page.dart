@@ -46,10 +46,11 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: AppColors.primaryColor,
           foregroundColor: Colors.white,
-          title: const Text("Aash India App"),
-          backgroundColor: appTheme(context).primaryColor,
+          child: Icon(Icons.qr_code_scanner),
         ),
         body: BlocBuilder<NavigationBloc, NavigationState>(
           builder: (context, state) {
@@ -59,6 +60,11 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ImageCarousel(),
+                    const SizedBox(height: 20),
+                    Text(
+                      '\tCategories',
+                      style: TextStyle(fontSize: 28),
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 60,
@@ -66,16 +72,19 @@ class _HomePageState extends State<HomePage> {
                         scrollDirection: Axis.horizontal,
                         children: const [
                           CategoryItem(
-                              name: 'Fashion', icon: Icons.shopping_bag),
-                          CategoryItem(name: 'Clothes', icon: Icons.woman),
+                            name: 'All',
+                            icon: Icons.shopping_bag,
+                            isActive: true,
+                          ),
+                          CategoryItem(name: 'Fashion', icon: Icons.woman),
                           CategoryItem(
-                              name: 'Footwear', icon: Icons.snowshoeing_sharp),
+                              name: 'Appliances', icon: Icons.cookie_rounded),
                           CategoryItem(
                               name: 'Electronics', icon: Icons.devices),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: BlocBuilder<CouponBloc, CouponState>(
@@ -90,6 +99,7 @@ class _HomePageState extends State<HomePage> {
                               itemCount: state.coupons.length,
                               itemBuilder: (context, index) {
                                 return CouponCard(
+                                  id: state.coupons[index]['_id'],
                                   color: hexToColor(
                                       state.coupons[index]['style']['color']),
                                   title: state.coupons[index]['title'],

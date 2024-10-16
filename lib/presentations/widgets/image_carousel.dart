@@ -35,8 +35,8 @@ class ImageCarouselState extends State<ImageCarousel> {
       }
       _pageController.animateToPage(
         _currentPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
       );
     });
   }
@@ -52,48 +52,87 @@ class ImageCarouselState extends State<ImageCarousel> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 300.0,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: _images.length,
-            onPageChanged: (int page) {
-              setState(() {
-                _currentPage = page;
-              });
-            },
-            itemBuilder: (context, index) {
-              return Image.network(
-                _images[index],
-                fit: BoxFit.fitHeight,
-              );
-            },
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _images.asMap().entries.map((entry) {
-            return GestureDetector(
-              onTap: () => _pageController.animateToPage(
-                entry.key,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            SizedBox(
+              height: 300.0,
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _images.length,
+                onPageChanged: (int page) {
+                  setState(() {
+                    _currentPage = page;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(0)),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          _images[index],
+                          fit: BoxFit.cover,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.transparent, Colors.black54],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: Text(
+                              'Image ${index + 1}', // Placeholder for any text overlay
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-              child: Container(
-                width: 8.0,
-                height: 8.0,
-                margin:
-                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black)
-                      .withOpacity(_currentPage == entry.key ? 0.9 : 0.4),
-                ),
+            ),
+            Positioned(
+              bottom: 10.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _images.asMap().entries.map((entry) {
+                  return GestureDetector(
+                    onTap: () => _pageController.animateToPage(
+                      entry.key,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    ),
+                    child: Container(
+                      width: _currentPage == entry.key ? 12.0 : 8.0,
+                      height: _currentPage == entry.key ? 12.0 : 8.0,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPage == entry.key
+                            ? Colors.white
+                            : Colors.grey,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
+            ),
+          ],
         ),
       ],
     );
