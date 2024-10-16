@@ -46,11 +46,20 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: AppColors.primaryColor,
-          foregroundColor: Colors.white,
-          child: Icon(Icons.qr_code_scanner),
+        floatingActionButton: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, state) {
+            if (state is ProfileFetched) {
+              if (state.type == 'partner') {
+                return FloatingActionButton(
+                  onPressed: () {},
+                  backgroundColor: AppColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  child: Icon(Icons.qr_code_scanner),
+                );
+              }
+            }
+            return SizedBox();
+          },
         ),
         body: BlocBuilder<NavigationBloc, NavigationState>(
           builder: (context, state) {
