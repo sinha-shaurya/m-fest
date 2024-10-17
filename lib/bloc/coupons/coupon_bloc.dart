@@ -11,6 +11,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
   CouponBloc() : super(CouponInitial()) {
     on<GetAllCoupons>(_fetchAllCoupons);
     on<CreateCouponEvent>(_onCreateCoupon);
+    on<FilterCoupons>(_onFilterCoupons);
   }
 
   final String baseUrl =
@@ -48,6 +49,58 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       } else {
         emit(CouponFailed('Something went wrong'));
       }
+    } catch (error) {
+      emit(CouponFailed('Unknown error occurred.'));
+    }
+  }
+
+  Future<void> _onFilterCoupons(
+      FilterCoupons event,
+      Emitter<CouponState> emit
+      ) async {
+    emit(CouponLoading());
+
+    try {
+      List<Map<String, dynamic>> coupons = [];
+
+      if (state is CouponLoaded && event.category != 'All') {
+        coupons = (state as CouponLoaded).coupons;
+      } else {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('token');
+
+        if (token == null) {
+          emit(CouponFailed('Unable to fetch coupons'));
+          return;
+        }
+
+        final response = await http.get(
+          Uri.parse('$baseUrl/api/coupon/getall'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final List<dynamic> responseData = jsonDecode(response.body);
+          coupons = responseData.cast<Map<String, dynamic>>();
+
+          if (coupons.isEmpty) {
+            emit(CouponLoaded([]));
+            return;
+          }
+        } else {
+          emit(CouponFailed('Something went wrong'));
+          return;
+        }
+      }
+
+        final filteredCoupons = coupons.where((coupon) {
+          return coupon['category'][0] == event.category;
+        }).toList();
+
+      emit(CouponLoaded(event.category == 'All' ? coupons: filteredCoupons));
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
     }
