@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String activeCategory = 'All';
   @override
   void initState() {
     BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
@@ -79,17 +80,46 @@ class _HomePageState extends State<HomePage> {
                       height: 60,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
-                        children: const [
+                        children:  [
                           CategoryItem(
+                            onTap: (){
+                              if (activeCategory != 'All'){
+                              BlocProvider.of<CouponBloc>(context).add(FilterCoupons('All'));
+                              setState(() {
+                                activeCategory = 'All';
+                              });
+
+                              }
+                            },
                             name: 'All',
                             icon: Icons.shopping_bag,
-                            isActive: true,
+                            isActive: activeCategory == 'All',
                           ),
-                          CategoryItem(name: 'Fashion', icon: Icons.woman),
+                          CategoryItem(name: 'Fashion', icon: Icons.woman, isActive: activeCategory == 'Fashion' ,   onTap: (){
+    if (activeCategory != 'Fashion'){
+
+    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Fashion'));
+                            setState(() {
+                              activeCategory = 'Fashion';
+                            });}
+                          },),
                           CategoryItem(
-                              name: 'Appliances', icon: Icons.cookie_rounded),
+                              name: 'Appliances', icon: Icons.cookie_rounded, isActive: activeCategory == 'Appliances',   onTap: (){
+    if (activeCategory != 'Appliances'){
+
+    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Appliances'));
+                            setState(() {
+                              activeCategory = 'Appliances';
+                            });}
+                          },),
                           CategoryItem(
-                              name: 'Electronics', icon: Icons.devices),
+                              name: 'Electronics', icon: Icons.devices, isActive: activeCategory == 'Electronics',   onTap: (){
+    if (activeCategory != 'Electronics'){
+    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Electronics'));
+                            setState(() {
+                              activeCategory = 'Electronics';
+                            });}
+                          },),
                         ],
                       ),
                     ),
