@@ -17,6 +17,26 @@ class FilterCoupons extends CouponEvent {
   List<Object> get props => [category];
 }
 
+class AvailCouponEvent extends CouponEvent {
+  final String id;
+  const AvailCouponEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
+class CheckRedeem extends CouponEvent {
+  final String id;
+  const CheckRedeem(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
+class GetAvailedCoupons extends CouponEvent {
+  const GetAvailedCoupons();
+}
+
 class CreateCouponEvent extends CouponEvent {
   final String title;
   final String category;

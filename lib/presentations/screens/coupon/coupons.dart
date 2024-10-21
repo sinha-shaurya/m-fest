@@ -1,6 +1,11 @@
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_event.dart';
+import 'package:aash_india/bloc/coupons/coupon_state.dart';
+import 'package:aash_india/presentations/screens/coupon/qr_scanner.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:aash_india/utils/hex_to_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Coupons extends StatefulWidget {
   const Coupons({super.key});
@@ -16,58 +21,7 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-  }
-
-  // Mock coupon data
-  List<Map<String, dynamic>> coupons = [
-    {
-      'title': 'Electronics Discount',
-      'discountPercentage': 20,
-      'active': true,
-      'description': 'Get 20% off on electronics',
-      'validTill': '2024-12-31',
-      'price': 100,
-      'style': {
-        'color': '#FF5733',
-      },
-    },
-    {
-      'title': 'Grocery Offer',
-      'discountPercentage': 10,
-      'active': false,
-      'description': '10% off on your grocery shopping',
-      'validTill': '2023-10-01',
-      'price': 200,
-      'style': {
-        'color': '#33FF57',
-      },
-    },
-    {
-      'title': 'Clothing Sale',
-      'discountPercentage': 50,
-      'active': true,
-      'description': 'Buy 1 get 1 free on clothing',
-      'validTill': '2024-11-15',
-      'price': 300,
-      'style': {
-        'color': '#3357FF',
-      },
-    },
-    {
-      'title': 'Expired Gadget Sale',
-      'discountPercentage': 15,
-      'active': false,
-      'description': '15% off on gadgets',
-      'validTill': '2023-08-10',
-      'price': 150,
-      'style': {
-        'color': '#FF33A1',
-      },
-    },
-  ];
-
-  List<Map<String, dynamic>> getFilteredCoupons(bool isActive) {
-    return coupons.where((coupon) => coupon['active'] == isActive).toList();
+    BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons());
   }
 
   @override
@@ -78,34 +32,76 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Expired'),
+            Tab(text: 'Availed'),
+            Tab(text: 'History'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          buildCouponList(isActive: true),
-          buildCouponList(isActive: false),
+          BlocBuilder<CouponBloc, CouponState>(
+            builder: (context, state) {
+              if (state is CouponLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is CouponLoaded) {
+                final activeCoupons = state.coupons
+                    .where((coupon) => coupon['status'] != 'EXPIRED')
+                    .toList();
+                return buildCouponList(coupons: activeCoupons);
+              } else if (state is CouponFailed) {
+                return Center(child: Text(state.error));
+              } else {
+                return const Center(child: Text('No availed coupons found.'));
+              }
+            },
+          ),
+          BlocBuilder<CouponBloc, CouponState>(
+            builder: (context, state) {
+              if (state is CouponLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is CouponLoaded) {
+                final expiredCoupons = state.coupons
+                    .where((coupon) => coupon['status'] == 'EXPIRED')
+                    .toList();
+                return buildCouponList(coupons: expiredCoupons);
+              } else if (state is CouponFailed) {
+                return Center(child: Text(state.error));
+              } else {
+                return const Center(child: Text('No coupons found.'));
+              }
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget buildCouponList({required bool isActive}) {
-    List<Map<String, dynamic>> filteredCoupons = getFilteredCoupons(isActive);
+  Widget buildCouponList(
+      {required List<Map<String, dynamic>> coupons, bool expired = false}) {
+    if (coupons.isEmpty) {
+      return const Center(child: Text('No coupons available.'));
+    }
 
     return ListView.builder(
-      itemCount: filteredCoupons.length,
+      itemCount: coupons.length,
       itemBuilder: (context, index) {
-        var coupon = filteredCoupons[index];
+        var coupon = coupons[index];
 
         return CouponCard(
+          onTap: () async {
+            if (!expired) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const QRScannerScreen()),
+              );
+            }
+          },
           id: coupon['_id'],
-          color: hexToColor(coupon['style']['color']),
+          buttonTitle: "Scan",
+          color: hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
           title: coupon['title'],
-          isOwned: true,
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],
           subtitle: coupon['description'],
