@@ -12,6 +12,9 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     on<GetAllCoupons>(_fetchAllCoupons);
     on<CreateCouponEvent>(_onCreateCoupon);
     on<FilterCoupons>(_onFilterCoupons);
+    on<AvailCouponEvent>(_onAvailCoupon);
+    on<GetAvailedCoupons>(_onGetAvailedCoupons);
+    on<CheckRedeem>(_onCheckRedeem);
   }
 
   final String baseUrl =
@@ -54,10 +57,138 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     }
   }
 
+  Future<void> _onGetAvailedCoupons(
+      GetAvailedCoupons event, Emitter<CouponState> emit) async {
+    emit(CouponLoading());
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(CouponFailed('Unable to fetch coupons'));
+        return;
+      }
+
+      final responseAvailed = await http.get(
+        Uri.parse('$baseUrl/api/coupon/availed'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (responseAvailed.statusCode == 200) {
+        final List<dynamic> availedCouponIds =
+            await jsonDecode(responseAvailed.body);
+        final availableIds =
+            availedCouponIds.map((coupon) => coupon['consumerId']);
+        if (availedCouponIds.isEmpty) {
+          emit(CouponLoaded([]));
+          return;
+        }
+
+        if (state is CouponLoaded) {
+          final allCoupons = (state as CouponLoaded).coupons;
+          final availedCoupons = allCoupons
+              .where((coupon) => availableIds.contains(coupon['_id']))
+              .toList();
+          emit(CouponLoaded(availedCoupons));
+        } else {
+          final responseAll = await http.get(
+            Uri.parse('$baseUrl/api/coupon/getall'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token'
+            },
+          );
+
+          if (responseAll.statusCode == 200) {
+            final List<dynamic> responseData = jsonDecode(responseAll.body);
+            final List<Map<String, dynamic>> allCoupons =
+                responseData.cast<Map<String, dynamic>>();
+            final availedCoupons = allCoupons
+                .where((coupon) => availableIds.contains(coupon['_id']))
+                .toList();
+            emit(CouponLoaded(availedCoupons));
+          } else {
+            emit(CouponFailed('Failed to fetch all coupons.'));
+          }
+        }
+      } else {
+        emit(CouponFailed('Failed to fetch availed coupons.'));
+      }
+    } catch (error) {
+      emit(CouponFailed('Unknown error occurred.'));
+    }
+  }
+
+  Future<void> _onCheckRedeem(
+      CheckRedeem event, Emitter<CouponState> emit) async {
+    emit(CouponLoading());
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(CouponFailed('Unable to fetch coupons'));
+        return;
+      }
+
+      final responseAvailed = await http.get(
+        Uri.parse('$baseUrl/api/coupon/availed'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (responseAvailed.statusCode == 200) {
+        final List<dynamic> availedCouponIds = jsonDecode(responseAvailed.body);
+
+        if (availedCouponIds.contains(event.id)) {
+          emit(CouponRedeemed());
+          return;
+        }
+      } else {
+        emit(CouponFailed('Failed to fetch availed coupons.'));
+        return;
+      }
+    } catch (error) {
+      emit(CouponFailed('Unknown error occurred.'));
+    }
+  }
+
+  Future<void> _onAvailCoupon(
+      AvailCouponEvent event, Emitter<CouponState> emit) async {
+    emit(CouponLoading());
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(CouponFailed('Unable to fetch coupons'));
+        return;
+      }
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/coupon/avail/${event.id}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        emit(CouponSuccess());
+      } else {
+        emit(CouponFailed('Something went wrong'));
+      }
+    } catch (error) {
+      emit(CouponFailed('Unknown error occurred.'));
+    }
+  }
+
   Future<void> _onFilterCoupons(
-      FilterCoupons event,
-      Emitter<CouponState> emit
-      ) async {
+      FilterCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
 
     try {
@@ -96,11 +227,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         }
       }
 
-        final filteredCoupons = coupons.where((coupon) {
-          return coupon['category'][0] == event.category;
-        }).toList();
+      final filteredCoupons = coupons.where((coupon) {
+        return coupon['category'][0] == event.category;
+      }).toList();
 
-      emit(CouponLoaded(event.category == 'All' ? coupons: filteredCoupons));
+      emit(CouponLoaded(event.category == 'All' ? coupons : filteredCoupons));
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
     }

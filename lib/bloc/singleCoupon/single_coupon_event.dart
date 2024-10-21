@@ -13,3 +13,13 @@ class GetCouponData extends SingleCouponEvent {
   @override
   List<Object> get props => [id];
 }
+
+class CouponScanEvent extends SingleCouponEvent {
+  final String couponId;
+  final String? ownerId;
+
+  const CouponScanEvent(this.couponId, this.ownerId);
+
+  @override
+  List<Object> get props => [couponId];
+}

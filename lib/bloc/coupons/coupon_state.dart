@@ -20,6 +20,8 @@ class CouponLoaded extends CouponState {
 
 class CouponSuccess extends CouponState {}
 
+class CouponRedeemed extends CouponState {}
+
 class CouponFailed extends CouponState {
   final String error;
 

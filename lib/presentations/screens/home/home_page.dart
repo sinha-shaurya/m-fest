@@ -8,6 +8,7 @@ import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_event.dart';
 import 'package:aash_india/bloc/profile/profile_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/coupon/coupon_detail.dart';
 import 'package:aash_india/presentations/screens/coupon/coupons.dart';
 import 'package:aash_india/presentations/screens/coupon/create_coupon.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
@@ -47,21 +48,6 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-        floatingActionButton: BlocBuilder<ProfileBloc, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileFetched) {
-              if (state.type == 'partner') {
-                return FloatingActionButton(
-                  onPressed: () {},
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
-                  child: Icon(Icons.qr_code_scanner),
-                );
-              }
-            }
-            return SizedBox();
-          },
-        ),
         body: BlocBuilder<NavigationBloc, NavigationState>(
           builder: (context, state) {
             if (state is NavigationHome) {
@@ -80,46 +66,63 @@ class _HomePageState extends State<HomePage> {
                       height: 60,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
-                        children:  [
+                        children: [
                           CategoryItem(
-                            onTap: (){
-                              if (activeCategory != 'All'){
-                              BlocProvider.of<CouponBloc>(context).add(FilterCoupons('All'));
-                              setState(() {
-                                activeCategory = 'All';
-                              });
-
+                            onTap: () {
+                              if (activeCategory != 'All') {
+                                BlocProvider.of<CouponBloc>(context)
+                                    .add(FilterCoupons('All'));
+                                setState(() {
+                                  activeCategory = 'All';
+                                });
                               }
                             },
                             name: 'All',
                             icon: Icons.shopping_bag,
                             isActive: activeCategory == 'All',
                           ),
-                          CategoryItem(name: 'Fashion', icon: Icons.woman, isActive: activeCategory == 'Fashion' ,   onTap: (){
-    if (activeCategory != 'Fashion'){
-
-    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Fashion'));
-                            setState(() {
-                              activeCategory = 'Fashion';
-                            });}
-                          },),
                           CategoryItem(
-                              name: 'Appliances', icon: Icons.cookie_rounded, isActive: activeCategory == 'Appliances',   onTap: (){
-    if (activeCategory != 'Appliances'){
-
-    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Appliances'));
-                            setState(() {
-                              activeCategory = 'Appliances';
-                            });}
-                          },),
+                            name: 'Fashion',
+                            icon: Icons.woman,
+                            isActive: activeCategory == 'Fashion',
+                            onTap: () {
+                              if (activeCategory != 'Fashion') {
+                                BlocProvider.of<CouponBloc>(context)
+                                    .add(FilterCoupons('Fashion'));
+                                setState(() {
+                                  activeCategory = 'Fashion';
+                                });
+                              }
+                            },
+                          ),
                           CategoryItem(
-                              name: 'Electronics', icon: Icons.devices, isActive: activeCategory == 'Electronics',   onTap: (){
-    if (activeCategory != 'Electronics'){
-    BlocProvider.of<CouponBloc>(context).add(FilterCoupons('Electronics'));
-                            setState(() {
-                              activeCategory = 'Electronics';
-                            });}
-                          },),
+                            name: 'Appliances',
+                            icon: Icons.cookie_rounded,
+                            isActive: activeCategory == 'Appliances',
+                            onTap: () {
+                              if (activeCategory != 'Appliances') {
+                                BlocProvider.of<CouponBloc>(context)
+                                    .add(FilterCoupons('Appliances'));
+                                setState(() {
+                                  activeCategory = 'Appliances';
+                                });
+                              }
+                            },
+                          ),
+                          CategoryItem(
+                            name: 'Electronics',
+                            icon: Icons.devices,
+                            isActive: activeCategory == 'Electronics',
+                            onTap: () {
+                              if (activeCategory != 'Electronics') {
+                                BlocProvider.of<CouponBloc>(context)
+                                    .add(FilterCoupons('Electronics'));
+                                setState(() {
+                                  activeCategory = 'Electronics';
+                                });
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -139,8 +142,17 @@ class _HomePageState extends State<HomePage> {
                               itemBuilder: (context, index) {
                                 return CouponCard(
                                   id: state.coupons[index]['_id'],
-                                  color: hexToColor(
-                                      state.coupons[index]['style']['color']),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CouponDetail(
+                                        id: state.coupons[index]['_id'],
+                                      ),
+                                    ),
+                                  ),
+                                  // color: hexToColor(state.coupons[index]
+                                  //         ['style']?['color'] ??
+                                  //     '#FFFFFF'),
                                   title: state.coupons[index]['title'],
                                   discountPercent: state.coupons[index]
                                       ['discountPercentage'],
