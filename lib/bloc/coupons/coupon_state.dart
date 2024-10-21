@@ -18,6 +18,14 @@ class CouponLoaded extends CouponState {
   List<Object> get props => [coupons];
 }
 
+class ManageCouponLoaded extends CouponState {
+  final List<Map<String, dynamic>> coupons;
+  const ManageCouponLoaded(this.coupons);
+
+  @override
+  List<Object> get props => [coupons];
+}
+
 class CouponSuccess extends CouponState {}
 
 class CouponRedeemed extends CouponState {}

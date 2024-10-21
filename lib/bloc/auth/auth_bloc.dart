@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +27,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': event.email, 'password': event.password}),
       );
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String token = responseData['token'];

@@ -25,6 +25,19 @@ class AvailCouponEvent extends CouponEvent {
   List<Object> get props => [id];
 }
 
+class GetPartnerActiveCoupons extends CouponEvent {}
+
+class UpdateCouponAmount extends CouponEvent {
+  final double amount;
+  final String consumerId;
+  final String couponId;
+  const UpdateCouponAmount(
+      {required this.amount, required this.consumerId, required this.couponId});
+
+  @override
+  List<Object> get props => [amount, consumerId, couponId];
+}
+
 class CheckRedeem extends CouponEvent {
   final String id;
   const CheckRedeem(this.id);

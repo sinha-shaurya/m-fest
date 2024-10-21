@@ -13,6 +13,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
   final String baseUrl =
       dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+
   Future<void> _onProfileFetch(
       ProfileFetchInfo event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
@@ -30,7 +31,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         );
         if (response.statusCode == 200) {
           final res = jsonDecode(response.body);
-
           final userType = res['type'];
           if (userType == 'partner') {
             emit(ProfileFetched(
@@ -87,7 +87,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             body: jsonEncode({...event.data}));
         if (response.statusCode == 200) {
           final res = jsonDecode(response.body);
-
           final userType = res['type'];
           if (userType == 'partner') {
             emit(ProfileFetched(
