@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
@@ -20,7 +21,30 @@ class SingleCouponBloc extends Bloc<SingleCouponEvent, SingleCouponState> {
       CouponScanEvent event, Emitter<SingleCouponState> emit) async {
     emit(SingleCouponLoading());
     try {
-      emit(ScanSuccess(event.couponId));
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(SingleCouponFailed('Unable to fetch coupon'));
+        return;
+      }
+      final couponResponse = await http.put(
+        Uri.parse('$baseUrl/api/coupon/update-state/${event.couponId}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'partnerId': event.ownerId,
+          'status': 1,
+        }),
+      );
+      log(couponResponse.statusCode.toString());
+      if (couponResponse.statusCode == 200) {
+        emit(ScanSuccess("Coupon activated"));
+      } else {
+        emit(SingleCouponFailed('Invalid Partner'));
+      }
     } catch (err) {
       emit(SingleCouponFailed('Something went wrong'));
     }

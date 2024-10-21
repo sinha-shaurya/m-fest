@@ -9,6 +9,7 @@ import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/profile/info_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -19,6 +20,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool isOtherCategory = false;
+  bool _showQRCode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +40,32 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildProfileImage(state.gender == 'Male'),
+                    const SizedBox(height: 20),
+                    state.type == 'partner'
+                        ? ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _showQRCode = !_showQRCode;
+                              });
+                            },
+                            child: Text(
+                                _showQRCode ? 'Hide QR Code' : 'Show QR Code'),
+                          )
+                        : SizedBox(),
+                    const SizedBox(height: 20),
+                    if (_showQRCode)
+                      Container(
+                        decoration: _boxDecoration(),
+                        child: QrImageView(
+                          data: '1234567890',
+                          version: QrVersions.auto,
+                          size: 200.0,
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     _buildInfoSection(
                       title: 'Personal Information',
