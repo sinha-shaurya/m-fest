@@ -36,12 +36,13 @@ class SingleCouponBloc extends Bloc<SingleCouponEvent, SingleCouponState> {
         },
         body: jsonEncode({
           'partnerId': event.ownerId,
-          'status': 1,
+          'status': event.end ? 2 : 1,
         }),
       );
       log(couponResponse.statusCode.toString());
       if (couponResponse.statusCode == 200) {
-        emit(ScanSuccess("Coupon activated"));
+        emit(ScanSuccess(
+            event.end ? "Transaction completed" : "Coupon activated"));
       } else {
         emit(SingleCouponFailed('Invalid Partner'));
       }

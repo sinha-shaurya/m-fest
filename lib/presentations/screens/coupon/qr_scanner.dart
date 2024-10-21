@@ -1,3 +1,5 @@
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_bloc.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
@@ -8,7 +10,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QRScannerScreen extends StatefulWidget {
   final String couponId;
-  const QRScannerScreen({required this.couponId, super.key});
+  final bool end;
+  const QRScannerScreen({required this.couponId, this.end = false, super.key});
 
   @override
   State<StatefulWidget> createState() => _QRScannerScreenState();
@@ -21,6 +24,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     return BlocListener<SingleCouponBloc, SingleCouponState>(
       listener: (context, state) {
         if (state is ScanSuccess) {
+          BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons());
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
@@ -56,7 +60,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 for (final barcode in bars) {
                   if (barcode.rawValue != null) {
                     BlocProvider.of<SingleCouponBloc>(context).add(
-                        CouponScanEvent(widget.couponId, barcode.rawValue));
+                        CouponScanEvent(
+                            widget.couponId, barcode.rawValue, widget.end));
                   }
                 }
               },

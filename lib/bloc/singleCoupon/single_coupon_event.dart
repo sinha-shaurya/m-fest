@@ -17,8 +17,9 @@ class GetCouponData extends SingleCouponEvent {
 class CouponScanEvent extends SingleCouponEvent {
   final String couponId;
   final String? ownerId;
+  final bool end;
 
-  const CouponScanEvent(this.couponId, this.ownerId);
+  const CouponScanEvent(this.couponId, this.ownerId, this.end);
 
   @override
   List<Object> get props => [couponId];
