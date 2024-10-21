@@ -23,6 +23,15 @@ class SingleCouponLoaded extends SingleCouponState {
   List<Object> get props => [couponData, ownerData];
 }
 
+class ScanSuccess extends SingleCouponState {
+  final String message;
+
+  const ScanSuccess(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class SingleCouponFailed extends SingleCouponState {
   final String error;
 

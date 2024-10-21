@@ -1,8 +1,11 @@
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_event.dart';
+import 'package:aash_india/bloc/coupons/coupon_state.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_bloc.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
+import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/utils/date_formatter.dart';
-import 'package:aash_india/utils/hex_to_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,7 +29,18 @@ class _CouponDetailState extends State<CouponDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Coupon Details'),
+        backgroundColor: AppColors.primaryColor,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+        ),
+        title: const Text(
+          'Coupon Details',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: BlocBuilder<SingleCouponBloc, SingleCouponState>(
         builder: (context, state) {
@@ -42,8 +56,6 @@ class _CouponDetailState extends State<CouponDetail> {
             final String category = couponData['category'].join(', ');
             final int discountPercentage = couponData['discountPercentage'];
             final DateTime validTill = DateTime.parse(couponData['validTill']);
-            final String colorHex = couponData['style']['color'];
-            final bool isActive = couponData['active'];
 
             final String ownerFirstName = ownerData['firstname'];
             final String ownerLastName = ownerData['lastname'];
@@ -88,7 +100,7 @@ class _CouponDetailState extends State<CouponDetail> {
                       '$discountPercentage% OFF',
                       style: TextStyle(
                         fontSize: 22,
-                        color: hexToColor(colorHex),
+                        // color: hexToColor(colorHex),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -160,19 +172,36 @@ class _CouponDetailState extends State<CouponDetail> {
                     const SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
-                        onPressed: isActive ? () {} : null,
+                        onPressed: () {
+                          if (BlocProvider.of<CouponBloc>(context).state
+                              is! CouponLoading) {
+                            BlocProvider.of<CouponBloc>(context)
+                                .add(AvailCouponEvent(couponData['_id']));
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: hexToColor(colorHex),
+                          backgroundColor: couponData['redeemed']
+                              ? Colors.grey.shade400
+                              : AppColors.primaryColor,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 40.0, vertical: 15.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
-                        child: const Text(
-                          'Redeem Coupon',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
+                        child: BlocProvider.of<CouponBloc>(context).state
+                                is CouponLoading
+                            ? const CircularProgressIndicator()
+                            : Text(
+                                couponData['redeemed']
+                                    ? 'Already availed'
+                                    : 'Redeem',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: couponData['redeemed']
+                                        ? Colors.grey.shade800
+                                        : Colors.white),
+                              ),
                       ),
                     ),
                   ],
