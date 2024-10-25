@@ -105,6 +105,7 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                 MaterialPageRoute(
                   builder: (context) => QRScannerScreen(
                     couponId: coupon['_id'],
+                    end: coupon['totalPrice'] > 0,
                   ),
                 ),
               );
@@ -114,7 +115,9 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
           buttonTitle: coupon["status"] == "REDEEMED"
               ? "Scan"
               : "₹${coupon['totalPrice']}",
-          color: hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
+          color: coupon['status'] == 'EXPIRED'
+              ? Colors.grey.shade600
+              : hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
           title: coupon['title'],
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],

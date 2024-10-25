@@ -10,6 +10,7 @@ abstract class ProfileState extends Equatable {
 class ProfileInitial extends ProfileState {}
 
 class ProfileFetched extends ProfileState {
+  final String id;
   final String fname;
   final String lname;
   final String phone;
@@ -23,6 +24,7 @@ class ProfileFetched extends ProfileState {
   const ProfileFetched(
       {required this.fname,
       required this.lname,
+      required this.id,
       required this.phone,
       required this.gender,
       required this.city,
