@@ -90,21 +90,34 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
 
         return CouponCard(
           onTap: () async {
-            if (!expired) {
+            if (!expired && coupon['status'] == 'REDEEMED') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const QRScannerScreen()),
+                  builder: (context) => QRScannerScreen(
+                    couponId: coupon['_id'],
+                  ),
+                ),
+              );
+            } else if (!expired && coupon['status'] == 'ACTIVE') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QRScannerScreen(
+                    couponId: coupon['_id'],
+                  ),
+                ),
               );
             }
           },
           id: coupon['_id'],
-          buttonTitle: "Scan",
+          buttonTitle: coupon["status"] == "REDEEMED"
+              ? "Scan"
+              : "₹${coupon['totalPrice']}",
           color: hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
           title: coupon['title'],
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],
-          subtitle: coupon['description'],
           validity: DateTime.parse(coupon['validTill']),
           price: coupon['price'] ?? 100,
         );
