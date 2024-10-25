@@ -16,7 +16,6 @@ import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:aash_india/presentations/widgets/image_carousel.dart';
-import 'package:aash_india/utils/hex_to_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
