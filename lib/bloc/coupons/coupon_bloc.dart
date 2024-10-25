@@ -18,6 +18,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     on<CheckRedeem>(_onCheckRedeem);
     on<GetPartnerActiveCoupons>(_onPartnerActiveCouponFetch);
     on<UpdateCouponAmount>(_onUpdateCouponAmount);
+    on<TransferCouponEvent>(_onTransferCoupon);
   }
 
   final String baseUrl =
@@ -82,11 +83,15 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       if (responseAvailed.statusCode == 200) {
         final List<dynamic> availedCoupons =
             await jsonDecode(responseAvailed.body);
-        log(availedCoupons[0].toString());
-        final List<Map<String, dynamic>> couponsList =
-            availedCoupons.map((coupon) {
-          return Map<String, dynamic>.from(coupon);
-        }).toList();
+        List<Map<String, dynamic>> couponsList = [];
+        if (availedCoupons.isNotEmpty) {
+          couponsList = availedCoupons.map((coupon) {
+            return Map<String, dynamic>.from(coupon);
+          }).toList();
+        } else {
+          couponsList = [];
+        }
+
         emit(CouponLoaded(couponsList));
       } else {
         emit(CouponFailed('Failed to fetch availed coupons.'));
@@ -149,6 +154,45 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
+    }
+  }
+
+  Future<void> _onTransferCoupon(
+      TransferCouponEvent event, Emitter<CouponState> emit) async {
+    emit(CouponLoading());
+
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(CouponFailed('Unable to transfer coupon'));
+        return;
+      }
+
+      final body = jsonEncode({
+        'reciverId': event.userId,
+        'transferCount': event.count,
+      });
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/api/coupon/transfer-coupon'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        emit(CouponSuccess());
+      } else if (response.statusCode == 400) {
+        emit(CouponFailed('Insufficient coupon to transfer'));
+      } else {
+        emit(CouponFailed('Invalid coupon Id'));
+      }
+    } catch (error) {
+      emit(CouponFailed('Unknown error occurred during coupon transfer.'));
     }
   }
 

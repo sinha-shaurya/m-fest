@@ -1,6 +1,9 @@
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
+import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
+import 'package:aash_india/bloc/coupons/coupon_event.dart';
+import 'package:aash_india/bloc/coupons/coupon_state.dart';
 import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_event.dart';
 import 'package:aash_india/bloc/profile/profile_state.dart';
@@ -8,6 +11,7 @@ import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/profile/info_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -24,15 +28,29 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthLogout) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-              (Route<dynamic> route) => false);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthLogout) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (Route<dynamic> route) => false);
+            }
+          },
+        ),
+        BlocListener<CouponBloc, CouponState>(
+          listener: (context, state) {
+            if (state is CouponSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('Coupon(s) transferred successfully'),
+                backgroundColor: Colors.green,
+              ));
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileFetched) {
@@ -45,6 +63,18 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     _buildProfileImage(state.gender == 'Male'),
                     const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: state.id));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Copied to clipboard")),
+                        );
+                      },
+                      child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: _boxDecoration(),
+                          child: Text("id: ${state.id}")),
+                    ),
                     state.type == 'partner'
                         ? ElevatedButton(
                             onPressed: () {
@@ -61,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Container(
                         decoration: _boxDecoration(),
                         child: QrImageView(
-                          data: '1234567890',
+                          data: state.id,
                           version: QrVersions.auto,
                           size: 200.0,
                         ),
@@ -133,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    _buildSettingsSection(),
+                    _buildSettingsSection(state.type == 'partner'),
                     const SizedBox(height: 20),
                     _buildFooter(),
                   ],
@@ -192,11 +222,21 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSettingsSection() {
+  Widget _buildSettingsSection(bool isPartner) {
     return Container(
       decoration: _boxDecoration(),
       child: Column(
         children: [
+          !isPartner
+              ? ListTile(
+                  title: Text("Transfer Coupon"),
+                  leading: Icon(Icons.swap_horiz),
+                  onTap: () {
+                    showTransferDialog(context);
+                  },
+                )
+              : const SizedBox(),
+          !isPartner ? const Divider() : const SizedBox(),
           const ListTile(
             leading: Icon(Icons.replay),
             title: Text('Change Password'),
@@ -342,6 +382,86 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Save',
                 style: TextStyle(color: AppColors.primaryColor),
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showTransferDialog(BuildContext context) {
+    TextEditingController userIdController = TextEditingController();
+    int count = 1;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Transfer Coupon"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: userIdController,
+                decoration: InputDecoration(labelText: "User ID"),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      if (count > 1) {
+                        count--;
+                        (context as Element).markNeedsBuild();
+                      }
+                    },
+                  ),
+                  Text(count.toString(), style: TextStyle(fontSize: 18)),
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      count++;
+                      (context as Element).markNeedsBuild();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+            BlocBuilder<CouponBloc, CouponState>(
+              builder: (context, state) {
+                if (state is CouponLoading) {
+                  return CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  );
+                }
+                return ElevatedButton(
+                  onPressed: () {
+                    if (userIdController.text.isEmpty || count < 1) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Invalid data'),
+                        backgroundColor: AppColors.errorColor,
+                      ));
+                      return;
+                    }
+                    BlocProvider.of<CouponBloc>(context).add(
+                        TransferCouponEvent(
+                            userId: userIdController.text, count: count));
+                    Navigator.of(context).pop();
+                    return;
+                  },
+                  child: Text("Transfer"),
+                );
+              },
             ),
           ],
         );

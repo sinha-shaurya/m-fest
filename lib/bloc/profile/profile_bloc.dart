@@ -34,6 +34,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           final userType = res['type'];
           if (userType == 'partner') {
             emit(ProfileFetched(
+              id: res['_id'] ?? "",
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
@@ -47,6 +48,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             ));
           } else if (userType == 'customer') {
             emit(ProfileFetched(
+              id: res['_id'] ?? "",
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
@@ -90,6 +92,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           final userType = res['type'];
           if (userType == 'partner') {
             emit(ProfileFetched(
+              id: res['_id'] ?? "",
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
@@ -103,6 +106,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             ));
           } else if (userType == 'customer') {
             emit(ProfileFetched(
+              id: res['_id'] ?? "",
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
