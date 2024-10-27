@@ -108,23 +108,9 @@ class _LoginPageState extends State<LoginPage> {
                             prefixIcon: const Icon(Icons.lock),
                           ),
                         ),
-                        const SizedBox(height: 10),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Row(
-                              children: [
-                                Checkbox(
-                                    value: remember,
-                                    activeColor: AppColors.primaryColor,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        remember = value ?? false;
-                                      });
-                                    }),
-                                const Text("Remember Me"),
-                              ],
-                            ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
@@ -138,44 +124,46 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (BlocProvider.of<AuthBloc>(context).state
-                                is AuthLoading) {
-                              return;
-                            } else if (_emailController.text.isEmpty ||
-                                _passwordController.text.isEmpty) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('* All fields are required'),
-                                backgroundColor: AppColors.errorColor,
-                              ));
-                              return;
-                            } else {
-                              BlocProvider.of<AuthBloc>(context).add(AuthLogin(
-                                  _emailController.text,
-                                  _passwordController.text));
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 120),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                              if (state is AuthLoading) {
-                                return const CircularProgressIndicator();
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (BlocProvider.of<AuthBloc>(context).state
+                                  is AuthLoading) {
+                                return;
+                              } else if (_emailController.text.isEmpty ||
+                                  _passwordController.text.isEmpty) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text('* All fields are required'),
+                                  backgroundColor: AppColors.errorColor,
+                                ));
+                                return;
+                              } else {
+                                BlocProvider.of<AuthBloc>(context).add(
+                                    AuthLogin(_emailController.text,
+                                        _passwordController.text));
                               }
-                              return const Text(
-                                "Login",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              );
                             },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                if (state is AuthLoading) {
+                                  return const CircularProgressIndicator();
+                                }
+                                return const Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],
