@@ -34,9 +34,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final name = responseData['name'];
         final isCustomer = responseData['type'] == 'customer';
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
         if (isProfileCompleted) {
           emit(AuthSuccess());
+          await prefs.setString('token', token);
         } else {
           emit(AuthIncomplete(name: name, isCustomer: isCustomer));
         }
