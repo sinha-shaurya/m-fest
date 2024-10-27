@@ -35,10 +35,11 @@ class SplashScreenState extends State<SplashScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => CompleteProfile(
-                      isCustomer: state.isCustomer,
-                      name: state.name,
-                    )),
+              builder: (context) => CompleteProfile(
+                isCustomer: state.isCustomer,
+                name: state.name,
+              ),
+            ),
           );
         } else if (state is AuthFailed) {
           Navigator.pushReplacement(

@@ -2,6 +2,8 @@ import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/widgets/privacy_policy.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -150,62 +152,88 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (BlocProvider.of<AuthBloc>(context).state
-                                is AuthLoading) {
-                              return;
-                            } else if (_nameController.text.isEmpty ||
-                                _emailController.text.isEmpty ||
-                                _passwordController.text.isEmpty ||
-                                _confirmPassword.text.isEmpty) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('* All fields are required'),
-                                backgroundColor: AppColors.errorColor,
-                              ));
-                            } else if (_passwordController.text !=
-                                _confirmPassword.text) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('* Passwords do not match'),
-                                backgroundColor: AppColors.errorColor,
-                              ));
-                            } else if (!_emailController.text.contains('@') ||
-                                !_emailController.text.contains('.')) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text('* Invalid email format'),
-                                backgroundColor: AppColors.errorColor,
-                              ));
-                            } else {
-                              BlocProvider.of<AuthBloc>(context).add(
-                                  AuthRegister(
-                                      name: _nameController.text,
-                                      type: isCustomer ? 'customer' : 'partner',
-                                      email: _emailController.text,
-                                      password: _passwordController.text));
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 120),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: 'By clicking on register you agree to our ',
+                            style: TextStyle(color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: 'Terms & Policy',
+                                style: TextStyle(color: AppColors.primaryColor),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return PrivacyPolicy();
+                                      },
+                                    );
+                                  },
+                              ),
+                            ],
                           ),
-                          child: BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                              if (state is AuthLoading) {
-                                return const CircularProgressIndicator();
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (BlocProvider.of<AuthBloc>(context).state
+                                  is AuthLoading) {
+                                return;
+                              } else if (_nameController.text.isEmpty ||
+                                  _emailController.text.isEmpty ||
+                                  _passwordController.text.isEmpty ||
+                                  _confirmPassword.text.isEmpty) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text('* All fields are required'),
+                                  backgroundColor: AppColors.errorColor,
+                                ));
+                              } else if (_passwordController.text !=
+                                  _confirmPassword.text) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text('* Passwords do not match'),
+                                  backgroundColor: AppColors.errorColor,
+                                ));
+                              } else if (!_emailController.text.contains('@') ||
+                                  !_emailController.text.contains('.')) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text('* Invalid email format'),
+                                  backgroundColor: AppColors.errorColor,
+                                ));
+                              } else {
+                                BlocProvider.of<AuthBloc>(context).add(
+                                    AuthRegister(
+                                        name: _nameController.text,
+                                        type:
+                                            isCustomer ? 'customer' : 'partner',
+                                        email: _emailController.text,
+                                        password: _passwordController.text));
                               }
-                              return const Text(
-                                "Create",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              );
                             },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                if (state is AuthLoading) {
+                                  return const CircularProgressIndicator();
+                                }
+                                return const Text(
+                                  "Register",
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ],
