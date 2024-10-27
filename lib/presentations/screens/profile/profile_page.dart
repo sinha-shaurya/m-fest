@@ -10,10 +10,13 @@ import 'package:aash_india/bloc/profile/profile_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/profile/info_tile.dart';
+import 'package:aash_india/presentations/widgets/how_it_works.dart';
+import 'package:aash_india/presentations/widgets/privacy_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -251,9 +254,30 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           const Divider(),
-          const ListTile(
+          ListTile(
+            leading: Icon(Icons.work),
+            title: Text('How it works'),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return HowItWorks();
+                },
+              );
+            },
+          ),
+          const Divider(),
+          ListTile(
             leading: Icon(Icons.privacy_tip_rounded),
             title: Text('Privacy Policy'),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return PrivacyPolicy();
+                },
+              );
+            },
           ),
           const Divider(),
           ListTile(
@@ -286,11 +310,38 @@ class _ProfilePageState extends State<ProfilePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'All copyright reserved',
+            'Designed & Developed by',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey.shade600),
           ),
-          const Text('Aash India'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  const url = 'https://www.instagram.com/_sonu.hansda_';
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(Uri.parse(url));
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: const Text('Sonu Hansda'),
+              ),
+              const Text(' & '),
+              GestureDetector(
+                onTap: () async {
+                  const url = 'https://www.instagram.com/ayush.kr._singh';
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(Uri.parse(url));
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: const Text('Ayush Singh'),
+              ),
+            ],
+          ),
         ],
       ),
     );
