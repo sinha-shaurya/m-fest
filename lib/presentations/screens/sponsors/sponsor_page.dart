@@ -1,50 +1,72 @@
+import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
+import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
+import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
+import 'package:aash_india/core/constants/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SponsorPage extends StatelessWidget {
+class SponsorPage extends StatefulWidget {
   const SponsorPage({super.key});
+
+  @override
+  State<SponsorPage> createState() => _SponsorPageState();
+}
+
+class _SponsorPageState extends State<SponsorPage> {
+  @override
+  void initState() {
+    BlocProvider.of<SponsorBloc>(context).add(GetAllSponsors());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Featured Sponsors',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Featured Sponsors',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            _buildSponsorBanner(
-              title: 'ABC Insurance',
-              description: 'Get the best deals on insurance now!',
-              logoPath: 'https://licindia.in/o/lic-theme/images/lic_logo.png',
-              url: 'https://www.abcinsurance.com',
-            ),
-            const SizedBox(height: 20),
-            _buildSponsorBanner(
-              title: 'DEF Insurance',
-              description: 'Get the best deals on insurance now!',
-              logoPath:
-                  'https://cdn.prod.website-files.com/6145f7156a1337613524d548/63f4a8e8e3b73c67a201716d_logo__Bajaj.png',
-              url: 'https://www.abcinsurance.com',
-            ),
-            const SizedBox(height: 20),
-            _buildSponsorBanner(
-              title: 'Health Insurance',
-              description: 'Get the best deals on insurance now!',
-              logoPath:
-                  'https://1finance.co.in/magazine/wp-content/uploads/2023/06/16404392_tp212-socialmedia-02-1-scaled.jpg',
-              url: 'https://www.abcinsurance.com',
-            ),
-            const SizedBox(height: 20),
-            // Add more sponsors here if needed
-          ],
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: BlocBuilder<SponsorBloc, SponsorState>(
+                  builder: (context, state) {
+                    if (state is SponsorLoaded) {
+                      if (state.sponsors.isEmpty) {
+                        return Text("No sponsors available");
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: state.sponsors.length,
+                        itemBuilder: (context, index) {
+                          return _buildSponsorBanner(
+                              title: state.sponsors[index]['title'],
+                              logoPath: state.sponsors[index]['img'],
+                              url: state.sponsors[index]['link']);
+                        },
+                      );
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: AppColors.primaryColor,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -52,7 +74,7 @@ class SponsorPage extends StatelessWidget {
 
   Widget _buildSponsorBanner({
     required String title,
-    required String description,
+    String? description,
     required String logoPath,
     required String url,
   }) {
@@ -99,7 +121,7 @@ class SponsorPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    description,
+                    description ?? "",
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,

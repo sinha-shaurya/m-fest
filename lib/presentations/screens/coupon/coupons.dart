@@ -3,7 +3,6 @@ import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
 import 'package:aash_india/presentations/screens/coupon/qr_scanner.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
-import 'package:aash_india/utils/hex_to_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -115,9 +114,9 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
           buttonTitle: coupon["status"] == "REDEEMED"
               ? "Scan"
               : "₹${coupon['totalPrice']}",
-          color: coupon['status'] == 'EXPIRED'
-              ? Colors.grey.shade600
-              : hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
+          // color: coupon['status'] == 'EXPIRED'
+          //     ? Colors.grey.shade600
+          //     : hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
           title: coupon['title'],
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],

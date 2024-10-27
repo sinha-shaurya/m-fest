@@ -74,6 +74,9 @@ class CouponCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(
+                      height: 25,
+                    ),
                     Text(
                       title,
                       style: TextStyle(

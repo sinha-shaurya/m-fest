@@ -59,117 +59,121 @@ class _ProfilePageState extends State<ProfilePage> {
           if (state is ProfileFetched) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildProfileImage(state.gender == 'Male'),
-                    const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: state.id));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Copied to clipboard")),
-                        );
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: _boxDecoration(),
-                          child: Text("id: ${state.id}")),
-                    ),
-                    state.type == 'partner'
-                        ? ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _showQRCode = !_showQRCode;
-                              });
-                            },
-                            child: Text(
-                                _showQRCode ? 'Hide QR Code' : 'Show QR Code'),
-                          )
-                        : SizedBox(),
-                    const SizedBox(height: 20),
-                    if (_showQRCode)
-                      Container(
-                        decoration: _boxDecoration(),
-                        child: QrImageView(
-                          data: state.id,
-                          version: QrVersions.auto,
-                          size: 200.0,
-                        ),
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildProfileImage(state.gender == 'Male'),
+                      const SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(text: state.id));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Copied to clipboard")),
+                          );
+                        },
+                        child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: _boxDecoration(),
+                            child: Text("id: ${state.id}")),
                       ),
-                    const SizedBox(height: 20),
-                    _buildInfoSection(
-                      title: 'Personal Information',
-                      content: [
-                        InfoTile(
-                          label: 'First Name',
-                          value: state.fname,
-                          icon: Icons.person,
+                      state.type == 'partner'
+                          ? ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showQRCode = !_showQRCode;
+                                });
+                              },
+                              child: Text(_showQRCode
+                                  ? 'Hide QR Code'
+                                  : 'Show QR Code'),
+                            )
+                          : SizedBox(),
+                      const SizedBox(height: 20),
+                      if (_showQRCode)
+                        Container(
+                          decoration: _boxDecoration(),
+                          child: QrImageView(
+                            data: state.id,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ),
                         ),
-                        InfoTile(
-                          label: 'Last Name',
-                          value: state.lname,
-                          icon: Icons.person,
-                        ),
-                        InfoTile(
-                          label: 'Phone Number',
-                          value: state.phone,
-                          icon: Icons.phone,
-                        ),
-                      ],
-                      onEditPressed: () {
-                        _showEditPersonalInfoDialog(context, state);
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _buildInfoSection(
-                      title: state.type == 'customer'
-                          ? 'Address Information'
-                          : 'Shop Information',
-                      content: [
-                        state.type == 'partner'
-                            ? InfoTile(
-                                label: 'Name',
-                                value: state.shopName ?? "",
-                                icon: Icons.shop,
-                              )
-                            : SizedBox(),
-                        state.type == 'partner'
-                            ? InfoTile(
-                                label: 'Category',
-                                value: state.shopCategory ?? "",
-                                icon: Icons.category,
-                              )
-                            : SizedBox(),
-                        InfoTile(
-                          label: 'City',
-                          value: state.city,
-                          icon: Icons.location_city,
-                        ),
-                        InfoTile(
-                          label: 'State',
-                          value: state.state,
-                          icon: Icons.map_outlined,
-                        ),
-                        InfoTile(
-                          label: 'Pincode',
-                          value: state.pincode,
-                          icon: Icons.numbers,
-                        ),
-                      ],
-                      onEditPressed: () {
-                        state.type == 'customer'
-                            ? _showEditAddressDialog(context, state)
-                            : _showEditShopInfoDialog(context, state);
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _buildSettingsSection(state.type == 'partner'),
-                    const SizedBox(height: 20),
-                    _buildFooter(),
-                  ],
+                      const SizedBox(height: 20),
+                      _buildInfoSection(
+                        title: 'Personal Information',
+                        content: [
+                          InfoTile(
+                            label: 'First Name',
+                            value: state.fname,
+                            icon: Icons.person,
+                          ),
+                          InfoTile(
+                            label: 'Last Name',
+                            value: state.lname,
+                            icon: Icons.person,
+                          ),
+                          InfoTile(
+                            label: 'Phone Number',
+                            value: state.phone,
+                            icon: Icons.phone,
+                          ),
+                        ],
+                        onEditPressed: () {
+                          _showEditPersonalInfoDialog(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildInfoSection(
+                        title: state.type == 'customer'
+                            ? 'Address Information'
+                            : 'Shop Information',
+                        content: [
+                          state.type == 'partner'
+                              ? InfoTile(
+                                  label: 'Name',
+                                  value: state.shopName ?? "",
+                                  icon: Icons.shop,
+                                )
+                              : SizedBox(),
+                          state.type == 'partner'
+                              ? InfoTile(
+                                  label: 'Category',
+                                  value: state.shopCategory ?? "",
+                                  icon: Icons.category,
+                                )
+                              : SizedBox(),
+                          InfoTile(
+                            label: 'City',
+                            value: state.city,
+                            icon: Icons.location_city,
+                          ),
+                          InfoTile(
+                            label: 'State',
+                            value: state.state,
+                            icon: Icons.map_outlined,
+                          ),
+                          InfoTile(
+                            label: 'Pincode',
+                            value: state.pincode,
+                            icon: Icons.numbers,
+                          ),
+                        ],
+                        onEditPressed: () {
+                          state.type == 'customer'
+                              ? _showEditAddressDialog(context, state)
+                              : _showEditShopInfoDialog(context, state);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSettingsSection(state.type == 'partner'),
+                      const SizedBox(height: 20),
+                      _buildFooter(),
+                    ],
+                  ),
                 ),
               ),
             );
