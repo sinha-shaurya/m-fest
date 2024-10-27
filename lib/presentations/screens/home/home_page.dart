@@ -16,7 +16,6 @@ import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:aash_india/presentations/widgets/image_carousel.dart';
-import 'package:aash_india/utils/hex_to_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -60,6 +59,9 @@ class _HomePageState extends State<HomePage> {
           body: BlocBuilder<NavigationBloc, NavigationState>(
             builder: (context, state) {
               if (state is NavigationHome) {
+                BlocProvider.of<CouponBloc>(context)
+                    .add(FilterCoupons(activeCategory));
+
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,9 +161,11 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                    color: hexToColor(state.coupons[index]
-                                            ['style']?['color'] ??
-                                        '#FFFFFF'),
+                                    // color: hexToColor(
+                                    //   (state.coupons[index]['style'] as Map<
+                                    //           String, dynamic>)['color'] ??
+                                    //       '#ffffff',
+                                    // ),
                                     title: state.coupons[index]['title'],
                                     discountPercent: state.coupons[index]
                                         ['discountPercentage'],
