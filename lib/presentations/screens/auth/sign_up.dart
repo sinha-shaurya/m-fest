@@ -20,7 +20,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
-  bool remember = true;
+  bool showPassword = false;
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
@@ -124,22 +124,36 @@ class _SignUpState extends State<SignUp> {
                         const SizedBox(height: 16),
                         TextField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: showPassword,
                           decoration: InputDecoration(
                             focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                              borderSide:
+                                  BorderSide(color: AppColors.primaryColor),
+                            ),
                             labelText: "Password",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                             prefixIcon: const Icon(Icons.lock),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  showPassword = !showPassword;
+                                });
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         TextField(
                           controller: _confirmPassword,
-                          obscureText: false,
+                          obscureText: true,
                           decoration: InputDecoration(
                             focusedBorder: OutlineInputBorder(
                                 borderSide:
@@ -186,33 +200,51 @@ class _SignUpState extends State<SignUp> {
                                   _emailController.text.isEmpty ||
                                   _passwordController.text.isEmpty ||
                                   _confirmPassword.text.isEmpty) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text('* All fields are required'),
-                                  backgroundColor: AppColors.errorColor,
-                                ));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('* All fields are required'),
+                                    backgroundColor: AppColors.errorColor,
+                                  ),
+                                );
                               } else if (_passwordController.text !=
                                   _confirmPassword.text) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text('* Passwords do not match'),
-                                  backgroundColor: AppColors.errorColor,
-                                ));
-                              } else if (!_emailController.text.contains('@') ||
-                                  !_emailController.text.contains('.')) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text('* Invalid email format'),
-                                  backgroundColor: AppColors.errorColor,
-                                ));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('* Passwords do not match'),
+                                    backgroundColor: AppColors.errorColor,
+                                  ),
+                                );
+                              } else if (!_emailController.text.contains(RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'))) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('* Invalid email format'),
+                                    backgroundColor: AppColors.errorColor,
+                                  ),
+                                );
+                              } else if (_passwordController.text.length < 8 ||
+                                  !_passwordController.text
+                                      .contains(RegExp(r'[A-Z]')) ||
+                                  !_passwordController.text
+                                      .contains(RegExp(r'[a-z]')) ||
+                                  !_passwordController.text
+                                      .contains(RegExp(r'[0-9]'))) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '* Password must be at least 8 characters long and include uppercase, lowercase, and numeric characters'),
+                                    backgroundColor: AppColors.errorColor,
+                                  ),
+                                );
                               } else {
                                 BlocProvider.of<AuthBloc>(context).add(
-                                    AuthRegister(
-                                        name: _nameController.text,
-                                        type:
-                                            isCustomer ? 'customer' : 'partner',
-                                        email: _emailController.text,
-                                        password: _passwordController.text));
+                                  AuthRegister(
+                                    name: _nameController.text,
+                                    type: isCustomer ? 'customer' : 'partner',
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                  ),
+                                );
                               }
                             },
                             style: ElevatedButton.styleFrom(

@@ -21,15 +21,54 @@ class _CompleteProfileState extends State<CompleteProfile> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _stateController = TextEditingController();
   final TextEditingController _zipCodeController = TextEditingController();
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   String _selectedCategory = 'Electronics';
+  String _selectedState = 'Bihar';
   bool _showOtherCategoryField = false;
 
   String? _selectedGender;
   bool _isStepOne = true;
+
+  final List<String> statesAndUTs = [
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Lakshadweep',
+    'Delhi',
+    'Puducherry',
+    'Ladakh',
+    'Jammu and Kashmir'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -168,17 +207,23 @@ class _CompleteProfileState extends State<CompleteProfile> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              final nameRegex = RegExp(r'^[A-Za-z]{2,}$');
+              final phoneRegex = RegExp(r'^[6-9][0-9]{9}$');
+
               if (_firstNameController.text.isEmpty ||
+                  !nameRegex.hasMatch(_firstNameController.text) ||
                   _lastNameController.text.isEmpty ||
-                  _phoneNumberController.text.isEmpty) {
+                  !nameRegex.hasMatch(_lastNameController.text)) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('* All fields are required'),
+                  content: Text('Please enter valid first and last names.'),
                   backgroundColor: AppColors.errorColor,
                 ));
                 return;
-              } else if (_phoneNumberController.text.trim().length != 10) {
+              } else if (_phoneNumberController.text.trim().isEmpty ||
+                  !phoneRegex.hasMatch(_phoneNumberController.text.trim())) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Please enter a valid phone number'),
+                  content: Text(
+                      'Please enter a valid 10-digit Indian phone number.'),
                   backgroundColor: AppColors.errorColor,
                 ));
                 return;
@@ -222,27 +267,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
       ),
       child: Column(
         children: [
-          // ElevatedButton.icon(
-          //   onPressed: _autoDetectLocation,
-          //   icon: const Icon(
-          //     Icons.location_on,
-          //     color: AppColors.primaryColor,
-          //   ),
-          //   label: const Text(
-          //     "Detect Location",
-          //     style: TextStyle(color: AppColors.primaryColor),
-          //   ),
-          //   style: ElevatedButton.styleFrom(
-          //     backgroundColor: Colors.white,
-          //     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          //     shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(8),
-          //         side: BorderSide(color: Colors.grey.shade600)),
-          //   ),
-          // ),
-          // const SizedBox(height: 16),
-          // const Text("Or"),
-          // const SizedBox(height: 16),
           TextField(
             controller: _cityController,
             decoration: InputDecoration(
@@ -255,17 +279,35 @@ class _CompleteProfileState extends State<CompleteProfile> {
               prefixIcon: const Icon(Icons.location_city),
             ),
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _stateController,
-            decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
-              labelText: "State",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+          const SizedBox(
+            height: 16,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: DropdownButtonFormField<String>(
+              isExpanded: true,
+              value: _selectedState,
+              items: statesAndUTs.map((state) {
+                return DropdownMenuItem<String>(
+                  value: state,
+                  child: Text(state),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedState = newValue!;
+                });
+              },
+              decoration: InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor),
+                ),
+                labelText: "State",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                prefixIcon: Icon(Icons.location_on),
               ),
-              prefixIcon: const Icon(Icons.margin_sharp),
             ),
           ),
           const SizedBox(height: 16),
@@ -286,30 +328,45 @@ class _CompleteProfileState extends State<CompleteProfile> {
           ElevatedButton(
             onPressed: () {
               if (_cityController.text.isEmpty ||
-                  _stateController.text.isEmpty ||
+                  _selectedState.isEmpty ||
                   _zipCodeController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('* All fields are required'),
-                  backgroundColor: AppColors.errorColor,
-                ));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('* All fields are required'),
+                    backgroundColor: AppColors.errorColor,
+                  ),
+                );
                 return;
-              } else if (_zipCodeController.text.trim().length != 6) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Please enter a valid pincode'),
-                  backgroundColor: AppColors.errorColor,
-                ));
-                return;
-              } else {
-                BlocProvider.of<AuthBloc>(context).add(AuthCompleteProfile({
-                  "firstname": _firstNameController.text.trim(),
-                  "lastname": _lastNameController.text.trim(),
-                  "gender": _selectedGender,
-                  "phonenumber": _phoneNumberController.text.trim(),
-                  "city": _cityController.text.trim(),
-                  "state": _stateController.text.trim(),
-                  "pincode": _zipCodeController.text.trim(),
-                }));
               }
+              if (!RegExp(r"^[a-zA-Z\s]+$")
+                  .hasMatch(_cityController.text.trim())) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please enter a valid city name'),
+                    backgroundColor: AppColors.errorColor,
+                  ),
+                );
+                return;
+              }
+              if (!RegExp(r"^\d{6}$")
+                  .hasMatch(_zipCodeController.text.trim())) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please enter a valid 6-digit pincode'),
+                    backgroundColor: AppColors.errorColor,
+                  ),
+                );
+                return;
+              }
+              BlocProvider.of<AuthBloc>(context).add(AuthCompleteProfile({
+                "firstname": _firstNameController.text.trim(),
+                "lastname": _lastNameController.text.trim(),
+                "gender": _selectedGender,
+                "phonenumber": _phoneNumberController.text.trim(),
+                "city": _cityController.text.trim(),
+                "state": _selectedState,
+                "pincode": _zipCodeController.text.trim(),
+              }));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
@@ -349,65 +406,79 @@ class _CompleteProfileState extends State<CompleteProfile> {
           TextField(
             controller: _shopNameController,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
               labelText: "Shop Name",
+              prefixIcon: const Icon(Icons.store),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              prefixIcon: const Icon(Icons.store),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _cityController,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
               labelText: "City",
+              prefixIcon: const Icon(Icons.location_on),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              prefixIcon: const Icon(Icons.location_on),
             ),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _stateController,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
-              labelText: "State",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+          SizedBox(
+            width: double.infinity,
+            child: DropdownButtonFormField<String>(
+              isExpanded: true,
+              value: _selectedState,
+              items: statesAndUTs.map((state) {
+                return DropdownMenuItem<String>(
+                  value: state,
+                  child: Text(state),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedState = newValue!;
+                });
+              },
+              decoration: InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors.primaryColor),
+                ),
+                labelText: "State",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                prefixIcon: Icon(Icons.location_on),
               ),
-              prefixIcon: const Icon(Icons.location_city),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _zipCodeController,
-            keyboardType: TextInputType.phone,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
               labelText: "Pincode",
+              prefixIcon: const Icon(Icons.numbers),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              prefixIcon: const Icon(Icons.numbers),
             ),
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _selectedCategory,
-            items: <String>[
-              'Electronics',
-              'Clothes',
-              'Home Appliances',
-              'Others'
-            ].map((String category) {
+            items: ['Electronics', 'Clothes', 'Home Appliances', 'Others']
+                .map((String category) {
               return DropdownMenuItem<String>(
                 value: category,
                 child: Text(category),
@@ -421,12 +492,13 @@ class _CompleteProfileState extends State<CompleteProfile> {
             },
             decoration: InputDecoration(
               labelText: "Category",
+              prefixIcon: const Icon(Icons.category),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.primaryColor),
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              prefixIcon: const Icon(Icons.category),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
             ),
           ),
           if (_showOtherCategoryField) ...[
@@ -434,9 +506,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             TextField(
               controller: _categoryController,
               decoration: InputDecoration(
+                labelText: "Enter Category",
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primaryColor)),
-                labelText: "Enter category",
+                  borderSide: BorderSide(color: AppColors.primaryColor),
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -448,7 +521,8 @@ class _CompleteProfileState extends State<CompleteProfile> {
             onPressed: () {
               if (_shopNameController.text.isEmpty ||
                   _cityController.text.isEmpty ||
-                  _stateController.text.isEmpty ||
+                  _selectedState.isEmpty ||
+                  _zipCodeController.text.isEmpty ||
                   (_showOtherCategoryField &&
                       _categoryController.text.isEmpty)) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -456,21 +530,39 @@ class _CompleteProfileState extends State<CompleteProfile> {
                   backgroundColor: AppColors.errorColor,
                 ));
                 return;
-              } else {
-                BlocProvider.of<AuthBloc>(context).add(AuthCompleteProfile({
-                  "firstname": _firstNameController.text.trim(),
-                  "lastname": _lastNameController.text.trim(),
-                  "gender": _selectedGender,
-                  "phonenumber": _phoneNumberController.text.trim(),
-                  "shop_name": _shopNameController.text.trim(),
-                  "shop_city": _cityController.text.trim(),
-                  "shop_state": _stateController.text.trim(),
-                  "shop_pincode": _zipCodeController.text.trim(),
-                  "shop_category": _showOtherCategoryField
-                      ? _categoryController.text.trim()
-                      : _selectedCategory,
-                }));
               }
+
+              if (!RegExp(r"^[a-zA-Z\s]+$")
+                  .hasMatch(_cityController.text.trim())) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Please enter a valid city name'),
+                  backgroundColor: AppColors.errorColor,
+                ));
+                return;
+              }
+
+              if (!RegExp(r"^\d{6}$")
+                  .hasMatch(_zipCodeController.text.trim())) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Please enter a valid 6-digit pincode'),
+                  backgroundColor: AppColors.errorColor,
+                ));
+                return;
+              }
+
+              BlocProvider.of<AuthBloc>(context).add(AuthCompleteProfile({
+                "firstname": _firstNameController.text.trim(),
+                "lastname": _lastNameController.text.trim(),
+                "gender": _selectedGender,
+                "phonenumber": _phoneNumberController.text.trim(),
+                "shop_name": _shopNameController.text.trim(),
+                "shop_city": _cityController.text.trim(),
+                "shop_state": _selectedState,
+                "shop_pincode": _zipCodeController.text.trim(),
+                "shop_category": _showOtherCategoryField
+                    ? _categoryController.text.trim()
+                    : _selectedCategory,
+              }));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
