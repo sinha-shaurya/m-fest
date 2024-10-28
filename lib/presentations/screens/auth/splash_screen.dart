@@ -41,7 +41,7 @@ class SplashScreenState extends State<SplashScreen> {
               ),
             ),
           );
-        } else if (state is AuthFailed) {
+        } else {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),

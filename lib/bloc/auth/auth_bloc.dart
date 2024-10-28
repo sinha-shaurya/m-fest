@@ -34,9 +34,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final name = responseData['name'];
         final isCustomer = responseData['type'] == 'customer';
         final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
         if (isProfileCompleted) {
           emit(AuthSuccess());
-          await prefs.setString('token', token);
         } else {
           emit(AuthIncomplete(name: name, isCustomer: isCustomer));
         }
@@ -73,7 +73,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'type': event.type
         }),
       );
-
       if (response.statusCode == 201) {
         emit(AuthRegistered());
       } else {
@@ -181,16 +180,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           },
         );
         if (response.statusCode == 200) {
-          final responseData = jsonDecode(response.body); // Parse the response
+          final responseData = jsonDecode(response.body);
           final isProfileCompleted = responseData['isProfileCompleted'];
-          final name = responseData['name'];
-          final userType = responseData['type'];
 
-          if (!isProfileCompleted) {
-            emit(
-                AuthIncomplete(name: name, isCustomer: userType == 'customer'));
-          } else {
+          if (isProfileCompleted) {
             emit(AuthSuccess());
+          } else {
+            emit(AuthInitial());
           }
         } else {
           emit(AuthFailed('Failed to fetch profile data'));
