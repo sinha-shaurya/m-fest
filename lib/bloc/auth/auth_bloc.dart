@@ -189,10 +189,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             emit(AuthInitial());
           }
         } else {
-          emit(AuthFailed('Failed to fetch profile data'));
+          emit(AuthInitial());
         }
       } else {
-        emit(AuthFailed('Not authenticated'));
+        emit(AuthInitial());
       }
     } catch (error) {
       emit(AuthFailed('Unknown error occurred.'));
