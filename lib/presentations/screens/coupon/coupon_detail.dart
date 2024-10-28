@@ -183,6 +183,8 @@ class _CouponDetailState extends State<CouponDetail> {
                               if (couponState is! CouponLoading) {
                                 BlocProvider.of<CouponBloc>(context)
                                     .add(AvailCouponEvent(couponData['_id']));
+                                BlocProvider.of<SingleCouponBloc>(context)
+                                    .add(GetCouponData(widget.id));
                               }
                             },
                             style: ElevatedButton.styleFrom(
