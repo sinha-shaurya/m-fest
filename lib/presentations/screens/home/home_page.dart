@@ -171,15 +171,14 @@ class _HomePageState extends State<HomePage> {
                       ListTile(
                         leading: Icon(Icons.share),
                         title: Text('Share with Friends'),
-                        onTap: () {
+                        onTap: () async {
                           final message =
                               'Check out Aash India! Discover exclusive coupons and discounts at nearby shops!';
-
-                          Share.share(
+                          Navigator.pop(context);
+                          await Share.share(
                             message,
                             subject: 'Get Exciting Discounts with Aash India!',
                           );
-                          Navigator.pop(context);
                         },
                       ),
                       Divider(),
