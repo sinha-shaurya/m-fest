@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
@@ -39,7 +38,6 @@ class SingleCouponBloc extends Bloc<SingleCouponEvent, SingleCouponState> {
           'status': event.end ? 2 : 1,
         }),
       );
-      log(couponResponse.statusCode.toString());
       if (couponResponse.statusCode == 200) {
         emit(ScanSuccess(
             event.end ? "Transaction completed" : "Coupon activated"));

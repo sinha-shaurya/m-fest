@@ -96,7 +96,38 @@ class _SponsorPageState extends State<SponsorPage> {
                         BorderRadius.vertical(top: Radius.circular(8)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Image.network(logoPath, fit: BoxFit.fitHeight),
+                      child: Image.network(
+                        logoPath,
+                        fit: BoxFit.fitHeight,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Container(
+                            color: Colors.grey.shade300,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ??
+                                            1)
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey.shade300,
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.grey,
+                              size: 50,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -146,6 +177,36 @@ class _SponsorPageState extends State<SponsorPage> {
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey.shade300,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 80,
+                    height: 80,
+                    color: Colors.grey.shade300,
+                    child: Icon(
+                      Icons.broken_image,
+                      color: Colors.grey,
+                      size: 40,
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 20),
