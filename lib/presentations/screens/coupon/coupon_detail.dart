@@ -8,6 +8,7 @@ import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/utils/date_formatter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,8 +24,18 @@ class CouponDetail extends StatefulWidget {
 class _CouponDetailState extends State<CouponDetail> {
   @override
   void initState() {
-    BlocProvider.of<SingleCouponBloc>(context).add(GetCouponData(widget.id));
     super.initState();
+    BlocProvider.of<SingleCouponBloc>(context).add(GetCouponData(widget.id));
+  }
+
+  @override
+  void dispose() {
+    Future.microtask(() {
+      if (mounted) {
+        context.read<CouponBloc>().add(GetAllCoupons());
+      }
+    });
+    super.dispose();
   }
 
   @override
@@ -75,11 +86,28 @@ class _CouponDetailState extends State<CouponDetail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
-                      child: Image.network(
-                        'https://img.freepik.com/premium-vector/professional-electronic-devices-graphic-design-vector-art_1138841-23139.jpg?w=360',
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            'https://img.freepik.com/premium-vector/professional-electronic-devices-graphic-design-vector-art_1138841-23139.jpg?w=360',
                         height: 150,
                         width: double.infinity,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          height: 150,
+                          color: Colors.grey.shade300,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: 150,
+                          color: Colors.grey.shade300,
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 50,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
