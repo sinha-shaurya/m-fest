@@ -4,7 +4,6 @@ import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SponsorPage extends StatefulWidget {
   const SponsorPage({super.key});
@@ -80,7 +79,49 @@ class _SponsorPageState extends State<SponsorPage> {
   }) {
     return GestureDetector(
       onTap: () {
-        _launchURL(url);
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              insetPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(8)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(logoPath, fit: BoxFit.fitHeight),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(bottom: Radius.circular(12)),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Close',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -135,13 +176,5 @@ class _SponsorPageState extends State<SponsorPage> {
         ),
       ),
     );
-  }
-
-  void _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 }
