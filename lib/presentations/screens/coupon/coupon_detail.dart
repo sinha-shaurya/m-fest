@@ -32,7 +32,7 @@ class _CouponDetailState extends State<CouponDetail> {
   void dispose() {
     Future.microtask(() {
       if (mounted) {
-        context.read<CouponBloc>().add(GetAllCoupons());
+        BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
       }
     });
     super.dispose();
@@ -198,7 +198,9 @@ class _CouponDetailState extends State<CouponDetail> {
                         Text(phoneNumber, style: const TextStyle(fontSize: 16)),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(
+                      height: 16,
+                    ),
                     BlocBuilder<ProfileBloc, ProfileState>(
                       builder: (context, state) {
                         var couponState =
@@ -242,6 +244,44 @@ class _CouponDetailState extends State<CouponDetail> {
                         );
                       },
                     ),
+                    const SizedBox(height: 16),
+                    BlocBuilder<ProfileBloc, ProfileState>(
+                      builder: (context, state) {
+                        if (state is ProfileFetched) {
+                          if (state.type == 'customer') {
+                            return SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => showTransferDialog(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0, vertical: 15.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Transfer Coupon',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Icon(Icons.send),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                        return SizedBox();
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -251,6 +291,97 @@ class _CouponDetailState extends State<CouponDetail> {
           return const Center(child: Text('Something went wrong!'));
         },
       ),
+    );
+  }
+
+  void showTransferDialog(BuildContext context) {
+    TextEditingController mobileNumberController = TextEditingController();
+    int count = 1;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Transfer Coupon"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: mobileNumberController,
+                decoration: InputDecoration(labelText: "Mobile Number"),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      if (count > 1) {
+                        count--;
+                        (context as Element).markNeedsBuild();
+                      }
+                    },
+                  ),
+                  Text(count.toString(), style: TextStyle(fontSize: 18)),
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      count++;
+                      (context as Element).markNeedsBuild();
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Cancel"),
+            ),
+            BlocBuilder<CouponBloc, CouponState>(
+              builder: (context, state) {
+                if (state is CouponLoading) {
+                  return CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                  );
+                }
+                return ElevatedButton(
+                  onPressed: () {
+                    final phoneRegex = RegExp(r'^[6-9][0-9]{9}$');
+                    if (!phoneRegex
+                            .hasMatch(mobileNumberController.text.trim()) ||
+                        mobileNumberController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Invalid phone number'),
+                        backgroundColor: AppColors.errorColor,
+                      ));
+                      return;
+                    }
+                    if (count < 1) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Invalid data'),
+                        backgroundColor: AppColors.errorColor,
+                      ));
+                      return;
+                    }
+                    BlocProvider.of<CouponBloc>(context).add(
+                        TransferCouponEvent(
+                            mobileNumber: mobileNumberController.text,
+                            count: count));
+                    Navigator.of(context).pop();
+                    return;
+                  },
+                  child: Text("Transfer"),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
