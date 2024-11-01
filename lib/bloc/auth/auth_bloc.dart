@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,11 +32,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String token = responseData['token'];
         final bool isProfileCompleted = responseData['isProfileCompleted'];
+        final bool isApproved = responseData['isApproved'];
         final name = responseData['name'];
         final isCustomer = responseData['type'] == 'customer';
+        log(isApproved.toString());
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
         if (isProfileCompleted) {
+          if (!isCustomer && !isApproved) {
+            emit(AuthNotApproved());
+            return;
+          }
           emit(AuthSuccess());
         } else {
           emit(AuthIncomplete(name: name, isCustomer: isCustomer));
@@ -155,6 +162,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['type'] == 'partner' &&
+            responseData['isVerified'] == false) {
+          emit(AuthNotApproved());
+          return;
+        }
         emit(AuthSuccess());
       } else {
         emit(AuthFailed('Something went wrong'));
@@ -182,8 +195,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
           final isProfileCompleted = responseData['isProfileCompleted'];
-
           if (isProfileCompleted) {
+            if (responseData['type'] == 'partner' &&
+                responseData['isApproved'] == false) {
+              emit(AuthNotApproved());
+              return;
+            }
             emit(AuthSuccess());
           } else {
             emit(AuthInitial());

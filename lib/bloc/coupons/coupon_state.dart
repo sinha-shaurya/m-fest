@@ -26,7 +26,10 @@ class ManageCouponLoaded extends CouponState {
   List<Object> get props => [coupons];
 }
 
-class CouponSuccess extends CouponState {}
+class CouponSuccess extends CouponState {
+  final String? message;
+  const CouponSuccess(this.message);
+}
 
 class CouponRedeemed extends CouponState {}
 

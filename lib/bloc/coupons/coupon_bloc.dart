@@ -171,12 +171,12 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       }
 
       final body = jsonEncode({
-        'reciverId': event.userId,
+        'phoneNumber': event.mobileNumber,
         'transferCount': event.count,
       });
 
       final response = await http.put(
-        Uri.parse('$baseUrl/api/coupon/transfer-coupon'),
+        Uri.parse('$baseUrl/api/coupon/transfer-coupon-by-number'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -185,14 +185,18 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       );
 
       if (response.statusCode == 200) {
-        emit(CouponSuccess());
+        emit(CouponSuccess("successfully transferred."));
       } else if (response.statusCode == 400) {
         emit(CouponFailed('Insufficient coupon to transfer'));
+      } else if (response.statusCode == 404) {
+        emit(CouponFailed('No user found with this mobile number'));
       } else {
-        emit(CouponFailed('Invalid coupon Id'));
+        emit(CouponFailed('Failed to transfer coupon'));
       }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred during coupon transfer.'));
+    } finally {
+      await _fetchAllCoupons(GetAllCoupons(), emit);
     }
   }
 
@@ -260,7 +264,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
 
       if (responseAvailed.statusCode == 200) {
         add(GetPartnerActiveCoupons());
-        emit(CouponSuccess());
+        emit(CouponSuccess("Coupon amount updated."));
       } else {
         emit(CouponFailed('Failed to update coupon amount.'));
       }
@@ -289,7 +293,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       );
 
       if (response.statusCode == 200) {
-        emit(CouponSuccess());
+        emit(CouponSuccess('Coupon availed successfully.'));
       } else {
         emit(CouponFailed('Something went wrong'));
       }
@@ -378,7 +382,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         body: body,
       );
       if (response.statusCode == 201) {
-        emit(CouponSuccess());
+        emit(CouponSuccess('Coupon created successfully.'));
       } else {
         final errorData = jsonDecode(response.body);
         emit(CouponFailed(errorData['message'] ?? 'Failed to create coupon'));

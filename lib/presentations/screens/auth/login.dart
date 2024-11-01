@@ -6,6 +6,7 @@ import 'package:aash_india/presentations/screens/auth/forgot_password.dart';
 import 'package:aash_india/presentations/screens/auth/sign_up.dart';
 import 'package:aash_india/presentations/screens/home/complete_profile.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
+import 'package:aash_india/presentations/screens/profile/waiting_approval.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,6 +39,11 @@ class _LoginPageState extends State<LoginPage> {
             content: Text(state.message),
             backgroundColor: AppColors.errorColor,
           ));
+        } else if (state is AuthNotApproved) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => WaitingApproval()),
+              (Route<dynamic> route) => false);
         } else if (state is AuthIncomplete) {
           Navigator.pushAndRemoveUntil(
               context,

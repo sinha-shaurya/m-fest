@@ -26,12 +26,12 @@ class AvailCouponEvent extends CouponEvent {
 }
 
 class TransferCouponEvent extends CouponEvent {
-  final String userId;
+  final String mobileNumber;
   final int count;
 
-  const TransferCouponEvent({required this.userId, required this.count});
+  const TransferCouponEvent({required this.mobileNumber, required this.count});
   @override
-  List<Object> get props => [userId, count];
+  List<Object> get props => [mobileNumber, count];
 }
 
 class GetPartnerActiveCoupons extends CouponEvent {}

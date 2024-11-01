@@ -37,6 +37,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<ProfileBloc, ProfileState>(
       listener: (context, state) {
@@ -52,6 +58,11 @@ class _HomePageState extends State<HomePage> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.error),
               backgroundColor: AppColors.errorColor,
+            ));
+          } else if (state is CouponSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.message ?? "success"),
+              backgroundColor: Colors.green,
             ));
           }
         },

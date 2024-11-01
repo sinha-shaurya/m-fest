@@ -17,6 +17,8 @@ class AuthRegistered extends AuthState {}
 
 class AuthLogout extends AuthState {}
 
+class AuthNotApproved extends AuthState {}
+
 class AuthIncomplete extends AuthState {
   final String name;
 

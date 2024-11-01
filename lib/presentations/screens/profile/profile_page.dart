@@ -445,7 +445,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void showTransferDialog(BuildContext context) {
-    TextEditingController userIdController = TextEditingController();
+    TextEditingController mobileNumberController = TextEditingController();
     int count = 1;
 
     showDialog(
@@ -457,8 +457,8 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: userIdController,
-                decoration: InputDecoration(labelText: "User ID"),
+                controller: mobileNumberController,
+                decoration: InputDecoration(labelText: "Mobile Number"),
               ),
               SizedBox(height: 20),
               Row(
@@ -501,7 +501,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
                 return ElevatedButton(
                   onPressed: () {
-                    if (userIdController.text.isEmpty || count < 1) {
+                    if (mobileNumberController.text.isEmpty || count < 1) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('Invalid data'),
                         backgroundColor: AppColors.errorColor,
@@ -510,7 +510,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
                     BlocProvider.of<CouponBloc>(context).add(
                         TransferCouponEvent(
-                            userId: userIdController.text, count: count));
+                            mobileNumber: mobileNumberController.text,
+                            count: count));
                     Navigator.of(context).pop();
                     return;
                   },
