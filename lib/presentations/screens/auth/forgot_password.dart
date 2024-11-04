@@ -2,6 +2,7 @@ import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,7 +45,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             content: Text('Password changed successfully'),
             backgroundColor: Colors.green,
           ));
-          Navigator.of(context).pop(context);
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          } else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginPage(),
+                ),
+                (Route<dynamic> route) => false);
+          }
         }
       },
       child: Scaffold(

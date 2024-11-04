@@ -203,45 +203,50 @@ class _CouponDetailState extends State<CouponDetail> {
                     ),
                     BlocBuilder<ProfileBloc, ProfileState>(
                       builder: (context, state) {
-                        var couponState =
-                            BlocProvider.of<CouponBloc>(context).state;
+                        if (state is ProfileFetched) {
+                          if (state.type == 'customer') {
+                            var couponState =
+                                BlocProvider.of<CouponBloc>(context).state;
 
-                        return SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (couponState is! CouponLoading) {
-                                BlocProvider.of<CouponBloc>(context)
-                                    .add(AvailCouponEvent(couponData['_id']));
-                                BlocProvider.of<SingleCouponBloc>(context)
-                                    .add(GetCouponData(widget.id));
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: couponData['redeemed']
-                                  ? Colors.grey.shade400
-                                  : AppColors.primaryColor,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40.0, vertical: 15.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                            ),
-                            child: couponState is CouponLoading
-                                ? const CircularProgressIndicator()
-                                : Text(
-                                    couponData['redeemed']
-                                        ? 'Already availed'
-                                        : 'Redeem',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: couponData['redeemed']
-                                          ? Colors.grey.shade800
-                                          : Colors.white,
-                                    ),
+                            return SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (couponState is! CouponLoading) {
+                                    BlocProvider.of<CouponBloc>(context).add(
+                                        AvailCouponEvent(couponData['_id']));
+                                    BlocProvider.of<SingleCouponBloc>(context)
+                                        .add(GetCouponData(widget.id));
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: couponData['redeemed']
+                                      ? Colors.grey.shade400
+                                      : AppColors.primaryColor,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0, vertical: 15.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4.0),
                                   ),
-                          ),
-                        );
+                                ),
+                                child: couponState is CouponLoading
+                                    ? const CircularProgressIndicator()
+                                    : Text(
+                                        couponData['redeemed']
+                                            ? 'Already availed'
+                                            : 'Redeem',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: couponData['redeemed']
+                                              ? Colors.grey.shade800
+                                              : Colors.white,
+                                        ),
+                                      ),
+                              ),
+                            );
+                          }
+                        }
+                        return SizedBox();
                       },
                     ),
                     const SizedBox(height: 16),

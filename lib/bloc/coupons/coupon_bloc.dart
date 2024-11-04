@@ -29,6 +29,10 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     emit(CouponLoading());
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final selectedState = prefs.getString('selectedState');
+      if (selectedState == null || selectedState != event.state) {
+        await prefs.setString('selectedState', event.state ?? 'all');
+      }
       final token = prefs.getString('token');
 
       if (token == null) {
@@ -37,7 +41,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/coupon/getall'),
+        Uri.parse('$baseUrl/api/coupon/getall?state=$selectedState'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'
@@ -319,9 +323,9 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           emit(CouponFailed('Unable to fetch coupons'));
           return;
         }
-
+        final selectedState = prefs.getString('selectedState');
         final response = await http.get(
-          Uri.parse('$baseUrl/api/coupon/getall'),
+          Uri.parse('$baseUrl/api/coupon/getall?state=$selectedState'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',

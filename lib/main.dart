@@ -1,3 +1,4 @@
+import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<SingleCouponBloc>(create: (context) => SingleCouponBloc()),
         BlocProvider<CouponBloc>(create: (context) => CouponBloc()),
         BlocProvider<SponsorBloc>(create: (context) => SponsorBloc()),
+        BlocProvider<AppDataBloc>(create: (context) => AppDataBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

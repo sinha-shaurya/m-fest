@@ -13,7 +13,6 @@ import 'package:aash_india/presentations/screens/profile/info_tile.dart';
 import 'package:aash_india/presentations/widgets/how_it_works.dart';
 import 'package:aash_india/presentations/widgets/privacy_policy.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,19 +66,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       _buildProfileImage(state.gender == 'Male'),
                       const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(text: state.id));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Copied to clipboard")),
-                          );
-                        },
-                        child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: _boxDecoration(),
-                            child: Text("id: ${state.id}")),
-                      ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Clipboard.setData(ClipboardData(text: state.id));
+                      //     ScaffoldMessenger.of(context).showSnackBar(
+                      //       const SnackBar(
+                      //           content: Text("Copied to clipboard")),
+                      //     );
+                      //   },
+                      //   child: Container(
+                      //       padding: const EdgeInsets.all(8),
+                      //       decoration: _boxDecoration(),
+                      //       child: Text("id: ${state.id}")),
+                      // ),
                       state.type == 'partner'
                           ? ElevatedButton(
                               onPressed: () {
@@ -244,11 +243,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               : const SizedBox(),
           !isPartner ? const Divider() : const SizedBox(),
-          const ListTile(
-            leading: Icon(Icons.replay),
-            title: Text('Change Password'),
-          ),
-          const Divider(),
+          // const ListTile(
+          //   leading: Icon(Icons.replay),
+          //   title: Text('Change Password'),
+          // ),
+          // const Divider(),
           ListTile(
             leading: const Icon(Icons.mobile_friendly),
             title: const Text('Version'),
