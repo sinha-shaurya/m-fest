@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +34,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final bool isApproved = responseData['isApproved'];
         final name = responseData['name'];
         final isCustomer = responseData['type'] == 'customer';
-        log(isApproved.toString());
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
         if (isProfileCompleted) {

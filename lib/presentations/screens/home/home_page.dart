@@ -1,3 +1,5 @@
+import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
+import 'package:aash_india/bloc/appdata/app_data_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
 import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
@@ -13,11 +15,12 @@ import 'package:aash_india/presentations/screens/coupon/coupons.dart';
 import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
+import 'package:aash_india/presentations/widgets/app_drawer.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,17 +32,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String activeCategory = 'All';
   bool isPartner = false;
+  String? selectedState;
   @override
   void initState() {
+    _initializeState();
     BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
     BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
+    BlocProvider.of<AppDataBloc>(context).add(AppDataFetch());
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+  Future<void> _initializeState() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? state = pref.getString('selectedState');
+    setState(() {
+      selectedState = state;
+    });
   }
 
   @override
@@ -48,7 +56,7 @@ class _HomePageState extends State<HomePage> {
       listener: (context, state) {
         if (state is ProfileFetched) {
           setState(() {
-            isPartner = true;
+            isPartner = state.type != 'customer';
           });
         }
       },
@@ -82,139 +90,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          drawer: Drawer(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(0),
-                bottomRight: Radius.circular(0),
-              ),
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Aash India',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Address: 123 Main Street\nCity, Jharkhand\nPIN: 123456',
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Contact: +91 9876543210\nEmail: info@aashindia.com',
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.home),
-                        title: Text('Home'),
-                        onTap: () {
-                          BlocProvider.of<NavigationBloc>(context)
-                              .add(PageTapped(0));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.pages),
-                        title: Text('Sponsors'),
-                        onTap: () {
-                          BlocProvider.of<NavigationBloc>(context)
-                              .add(PageTapped(1));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.topic),
-                        title: Text('Coupons'),
-                        onTap: () {
-                          BlocProvider.of<NavigationBloc>(context)
-                              .add(PageTapped(2));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.settings),
-                        title: Text('Settings'),
-                        onTap: () {
-                          BlocProvider.of<NavigationBloc>(context)
-                              .add(PageTapped(3));
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.star),
-                        title: Text('Rate us'),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.share),
-                        title: Text('Share with Friends'),
-                        onTap: () async {
-                          final message =
-                              'Check out Aash India! Discover exclusive coupons and discounts at nearby shops!';
-                          Navigator.pop(context);
-                          await Share.share(
-                            message,
-                            subject: 'Get Exciting Discounts with Aash India!',
-                          );
-                        },
-                      ),
-                      Divider(),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(0),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Developed by Sonu & Ayush',
-                      style:
-                          TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          drawer: AppDrawer(),
           body: BlocBuilder<NavigationBloc, NavigationState>(
             builder: (context, state) {
               if (state is NavigationHome) {
@@ -225,6 +101,118 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 20),
+                      !isPartner
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  labelText: 'Select State',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                value: selectedState != 'all'
+                                    ? selectedState
+                                    : null,
+                                items: [
+                                  'Andhra Pradesh',
+                                  'Arunachal Pradesh',
+                                  'Assam',
+                                  'Bihar',
+                                  'Chhattisgarh',
+                                  'Goa',
+                                  'Gujarat',
+                                  'Haryana',
+                                  'Himachal Pradesh',
+                                  'Jharkhand',
+                                  'Karnataka',
+                                  'Kerala',
+                                  'Madhya Pradesh',
+                                  'Maharashtra',
+                                  'Manipur',
+                                  'Meghalaya',
+                                  'Mizoram',
+                                  'Nagaland',
+                                  'Odisha',
+                                  'Punjab',
+                                  'Rajasthan',
+                                  'Sikkim',
+                                  'Tamil Nadu',
+                                  'Telangana',
+                                  'Tripura',
+                                  'Uttar Pradesh',
+                                  'Uttarakhand',
+                                  'West Bengal',
+                                  'Andaman and Nicobar Islands',
+                                  'Chandigarh',
+                                  'Dadra and Nagar Haveli and Daman and Diu',
+                                  'Lakshadweep',
+                                  'Delhi',
+                                  'Puducherry',
+                                  'Ladakh',
+                                  'Jammu and Kashmir'
+                                ].map((String state) {
+                                  return DropdownMenuItem<String>(
+                                    value: state,
+                                    child: Text(state),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  BlocProvider.of<CouponBloc>(context)
+                                      .add(GetAllCoupons(state: value));
+                                  setState(() {
+                                    selectedState = value;
+                                  });
+                                },
+                              ),
+                            )
+                          : const SizedBox(),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 10.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Search...',
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(12),
+                                          bottomLeft: Radius.circular(12))),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide.none,
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(12),
+                                          bottomLeft: Radius.circular(12))),
+                                ),
+                                onChanged: (query) {},
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.all(16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(12),
+                                      bottomRight: Radius.circular(12)),
+                                ),
+                              ),
+                              child: Icon(Icons.search),
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 20),
                       Text(
                         '\tCategories',
@@ -381,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.pages),
-                    label: 'Sponsors',
+                    label: 'Banners',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.topic),

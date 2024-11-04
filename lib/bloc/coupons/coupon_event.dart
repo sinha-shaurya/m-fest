@@ -7,7 +7,10 @@ abstract class CouponEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetAllCoupons extends CouponEvent {}
+class GetAllCoupons extends CouponEvent {
+  final String? state;
+  const GetAllCoupons({this.state = 'all'});
+}
 
 class FilterCoupons extends CouponEvent {
   final String category;
