@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
 import 'package:aash_india/bloc/appdata/app_data_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
@@ -16,6 +18,7 @@ import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/app_drawer.dart';
+import 'package:aash_india/presentations/widgets/banner_carousel.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
@@ -32,22 +35,47 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String activeCategory = 'All';
   bool isPartner = false;
-  String? selectedState;
+  String? selectedCity;
+  List<String> cities = [];
+  late TextEditingController searchController;
+
   @override
   void initState() {
-    _initializeState();
-    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
     BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
     BlocProvider.of<AppDataBloc>(context).add(AppDataFetch());
+    searchController = TextEditingController();
+    loadCities();
+    _initializeState();
     super.initState();
   }
 
   Future<void> _initializeState() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    String? state = pref.getString('selectedState');
+    if (mounted) {
+      BlocProvider.of<CouponBloc>(context)
+          .add(GetAllCoupons(city: selectedCity));
+    }
     setState(() {
-      selectedState = state;
+      selectedCity = null;
     });
+  }
+
+  Future<void> loadCities() async {
+    try {
+      cities = await CouponBloc().fetchCities();
+      final SharedPreferences pref = await SharedPreferences.getInstance();
+      String? city = pref.getString('selectedCity');
+      setState(() {
+        selectedCity = city ?? (cities.isNotEmpty ? cities[0] : null);
+      });
+    } catch (error) {
+      log(error.toString());
+    }
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -89,6 +117,40 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.menu),
               ),
             ),
+            actions: [
+              cities.isNotEmpty
+                  ? DropdownButton<String>(
+                      value: selectedCity,
+                      icon: Icon(Icons.pin_drop, color: Colors.white),
+                      dropdownColor: AppColors.primaryColor,
+                      underline: SizedBox.shrink(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedCity = newValue;
+                        });
+                        BlocProvider.of<CouponBloc>(context)
+                            .add(GetAllCoupons(city: newValue));
+                      },
+                      items:
+                          cities.map<DropdownMenuItem<String>>((String city) {
+                        return DropdownMenuItem<String>(
+                          value: city,
+                          child: Text(
+                            city,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('N/A'),
+                        Icon(Icons.pin_drop),
+                      ],
+                    ),
+            ],
           ),
           drawer: AppDrawer(),
           body: BlocBuilder<NavigationBloc, NavigationState>(
@@ -97,238 +159,216 @@ class _HomePageState extends State<HomePage> {
                 BlocProvider.of<CouponBloc>(context)
                     .add(FilterCoupons(activeCategory));
 
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      !isPartner
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: DropdownButtonFormField<String>(
-                                decoration: InputDecoration(
-                                  labelText: 'Select State',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                return RefreshIndicator.adaptive(
+                  onRefresh: _initializeState,
+                  color: AppColors.accentColor,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BannerCarousel(),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 10.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: searchController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Search...',
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.grey.shade400),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(12),
+                                            bottomLeft: Radius.circular(12))),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(12),
+                                            bottomLeft: Radius.circular(12))),
                                   ),
                                 ),
-                                value: selectedState != 'all'
-                                    ? selectedState
-                                    : null,
-                                items: [
-                                  'Andhra Pradesh',
-                                  'Arunachal Pradesh',
-                                  'Assam',
-                                  'Bihar',
-                                  'Chhattisgarh',
-                                  'Goa',
-                                  'Gujarat',
-                                  'Haryana',
-                                  'Himachal Pradesh',
-                                  'Jharkhand',
-                                  'Karnataka',
-                                  'Kerala',
-                                  'Madhya Pradesh',
-                                  'Maharashtra',
-                                  'Manipur',
-                                  'Meghalaya',
-                                  'Mizoram',
-                                  'Nagaland',
-                                  'Odisha',
-                                  'Punjab',
-                                  'Rajasthan',
-                                  'Sikkim',
-                                  'Tamil Nadu',
-                                  'Telangana',
-                                  'Tripura',
-                                  'Uttar Pradesh',
-                                  'Uttarakhand',
-                                  'West Bengal',
-                                  'Andaman and Nicobar Islands',
-                                  'Chandigarh',
-                                  'Dadra and Nagar Haveli and Daman and Diu',
-                                  'Lakshadweep',
-                                  'Delhi',
-                                  'Puducherry',
-                                  'Ladakh',
-                                  'Jammu and Kashmir'
-                                ].map((String state) {
-                                  return DropdownMenuItem<String>(
-                                    value: state,
-                                    child: Text(state),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  BlocProvider.of<CouponBloc>(context)
-                                      .add(GetAllCoupons(state: value));
-                                  setState(() {
-                                    selectedState = value;
-                                  });
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (searchController.text.isNotEmpty) {
+                                    BlocProvider.of<CouponBloc>(context).add(
+                                      GetAllCoupons(
+                                          city: selectedCity,
+                                          search: searchController.text),
+                                    );
+                                  } else if (searchController.text.isEmpty) {
+                                    BlocProvider.of<CouponBloc>(context).add(
+                                      GetAllCoupons(city: selectedCity),
+                                    );
+                                  }
                                 },
-                              ),
-                            )
-                          : const SizedBox(),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 10.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  hintText: 'Search...',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.grey.shade400),
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(12),
-                                          bottomLeft: Radius.circular(12))),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(12),
-                                          bottomLeft: Radius.circular(12))),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(12),
+                                        bottomRight: Radius.circular(12)),
+                                  ),
                                 ),
-                                onChanged: (query) {},
+                                child: Icon(Icons.search),
                               ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(12),
-                                      bottomRight: Radius.circular(12)),
-                                ),
-                              ),
-                              child: Icon(Icons.search),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        '\tCategories',
-                        style: TextStyle(fontSize: 28),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        height: 60,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            CategoryItem(
-                              onTap: () {
-                                if (activeCategory != 'All') {
-                                  BlocProvider.of<CouponBloc>(context)
-                                      .add(FilterCoupons('All'));
-                                  setState(() {
-                                    activeCategory = 'All';
-                                  });
-                                }
-                              },
-                              name: 'All',
-                              icon: Icons.shopping_bag,
-                              isActive: activeCategory == 'All',
-                            ),
-                            CategoryItem(
-                              name: 'Fashion',
-                              icon: Icons.woman,
-                              isActive: activeCategory == 'Fashion',
-                              onTap: () {
-                                if (activeCategory != 'Fashion') {
-                                  BlocProvider.of<CouponBloc>(context)
-                                      .add(FilterCoupons('Fashion'));
-                                  setState(() {
-                                    activeCategory = 'Fashion';
-                                  });
-                                }
-                              },
-                            ),
-                            CategoryItem(
-                              name: 'Appliances',
-                              icon: Icons.cookie_rounded,
-                              isActive: activeCategory == 'Appliances',
-                              onTap: () {
-                                if (activeCategory != 'Appliances') {
-                                  BlocProvider.of<CouponBloc>(context)
-                                      .add(FilterCoupons('Appliances'));
-                                  setState(() {
-                                    activeCategory = 'Appliances';
-                                  });
-                                }
-                              },
-                            ),
-                            CategoryItem(
-                              name: 'Electronics',
-                              icon: Icons.devices,
-                              isActive: activeCategory == 'Electronics',
-                              onTap: () {
-                                if (activeCategory != 'Electronics') {
-                                  BlocProvider.of<CouponBloc>(context)
-                                      .add(FilterCoupons('Electronics'));
-                                  setState(() {
-                                    activeCategory = 'Electronics';
-                                  });
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: BlocBuilder<CouponBloc, CouponState>(
+                        const SizedBox(height: 20),
+                        BlocBuilder<ProfileBloc, ProfileState>(
                           builder: (context, state) {
-                            if (state is CouponLoaded) {
-                              if (state.coupons.isEmpty) {
-                                return Text("No coupons available");
-                              }
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: state.coupons.length,
-                                itemBuilder: (context, index) {
-                                  return CouponCard(
-                                    id: state.coupons[index]['_id'],
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => CouponDetail(
-                                          id: state.coupons[index]['_id'],
-                                        ),
-                                      ),
-                                    ),
-                                    title: state.coupons[index]['title'],
-                                    discountPercent: state.coupons[index]
-                                        ['discountPercentage'],
-                                    active: state.coupons[index]['active'],
-                                    subtitle: state.coupons[index]
-                                        ['description'],
-                                    validity: DateTime.parse(
-                                        state.coupons[index]['validTill']),
-                                    price: state.coupons[index]['price'] ?? 100,
-                                  );
-                                },
+                            if (state is ProfileFetched) {
+                              return Text(
+                                state.type == 'customer'
+                                    ? '\t\tPopular coupons'
+                                    : '\t\tYour coupons',
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.grey.shade800),
                               );
                             }
-                            return Center(
-                              child: CircularProgressIndicator(
-                                backgroundColor: AppColors.primaryColor,
-                              ),
+                            return Text(
+                              '\t\tPopular coupons',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.grey.shade800),
                             );
                           },
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+                        BlocBuilder<ProfileBloc, ProfileState>(
+                          builder: (context, state) {
+                            if (state is ProfileFetched) {
+                              if (state.type == 'customer') {
+                                return SizedBox(
+                                  height: 60,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: [
+                                      CategoryItem(
+                                        onTap: () {
+                                          if (activeCategory != 'All') {
+                                            BlocProvider.of<CouponBloc>(context)
+                                                .add(FilterCoupons('All'));
+                                            setState(() {
+                                              activeCategory = 'All';
+                                            });
+                                          }
+                                        },
+                                        name: 'All',
+                                        icon: Icons.shopping_bag,
+                                        isActive: activeCategory == 'All',
+                                      ),
+                                      CategoryItem(
+                                        name: 'Fashion',
+                                        icon: Icons.woman,
+                                        isActive: activeCategory == 'Fashion',
+                                        onTap: () {
+                                          if (activeCategory != 'Fashion') {
+                                            BlocProvider.of<CouponBloc>(context)
+                                                .add(FilterCoupons('Fashion'));
+                                            setState(() {
+                                              activeCategory = 'Fashion';
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      CategoryItem(
+                                        name: 'Appliances',
+                                        icon: Icons.cookie_rounded,
+                                        isActive:
+                                            activeCategory == 'Appliances',
+                                        onTap: () {
+                                          if (activeCategory != 'Appliances') {
+                                            BlocProvider.of<CouponBloc>(context)
+                                                .add(FilterCoupons(
+                                                    'Appliances'));
+                                            setState(() {
+                                              activeCategory = 'Appliances';
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      CategoryItem(
+                                        name: 'Electronics',
+                                        icon: Icons.devices,
+                                        isActive:
+                                            activeCategory == 'Electronics',
+                                        onTap: () {
+                                          if (activeCategory != 'Electronics') {
+                                            BlocProvider.of<CouponBloc>(context)
+                                                .add(FilterCoupons(
+                                                    'Electronics'));
+                                            setState(() {
+                                              activeCategory = 'Electronics';
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            }
+                            return SizedBox();
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: BlocBuilder<CouponBloc, CouponState>(
+                            builder: (context, state) {
+                              if (state is CouponLoaded) {
+                                if (state.coupons.isEmpty) {
+                                  return Text("No coupons available");
+                                }
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: state.coupons.length,
+                                  itemBuilder: (context, index) {
+                                    return CouponCard(
+                                      id: state.coupons[index]['_id'],
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CouponDetail(
+                                            id: state.coupons[index]['_id'],
+                                          ),
+                                        ),
+                                      ),
+                                      title: state.coupons[index]['title'],
+                                      category: state.coupons[index]['category']
+                                          [0],
+                                      discountPercent: state.coupons[index]
+                                          ['discountPercentage'],
+                                      active: state.coupons[index]['active'],
+                                      validity: DateTime.parse(
+                                          state.coupons[index]['validTill']),
+                                      price:
+                                          state.coupons[index]['price'] ?? 100,
+                                    );
+                                  },
+                                );
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: AppColors.primaryColor,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               } else if (state is NavigationCategories) {

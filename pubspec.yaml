@@ -9,12 +9,14 @@ environment:
 dependencies:
   cached_network_image: ^3.4.1
   cupertino_icons: ^1.0.8
+  custom_refresh_indicator: ^4.0.1
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
   flutter_dotenv: ^5.1.0
   http: ^1.2.2
+  liquid_pull_to_refresh: ^3.0.1
   mobile_scanner: ^6.0.1
   qr_flutter: ^4.1.0
   share_plus: ^10.1.1

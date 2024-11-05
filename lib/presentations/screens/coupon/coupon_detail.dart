@@ -11,6 +11,7 @@ import 'package:aash_india/utils/date_formatter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CouponDetail extends StatefulWidget {
   final String id;
@@ -30,9 +31,11 @@ class _CouponDetailState extends State<CouponDetail> {
 
   @override
   void dispose() {
-    Future.microtask(() {
+    Future.microtask(() async {
+      final SharedPreferences pref = await SharedPreferences.getInstance();
+      String? city = pref.getString('selectedCity');
       if (mounted) {
-        BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+        BlocProvider.of<CouponBloc>(context).add(GetAllCoupons(city: city));
       }
     });
     super.dispose();
@@ -81,213 +84,222 @@ class _CouponDetailState extends State<CouponDetail> {
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            'https://img.freepik.com/premium-vector/professional-electronic-devices-graphic-design-vector-art_1138841-23139.jpg?w=360',
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
+              child: RefreshIndicator(
+                onRefresh: () async =>
+                    BlocProvider.of<SingleCouponBloc>(context)
+                        .add(GetCouponData(widget.id)),
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'https://img.freepik.com/premium-vector/professional-electronic-devices-graphic-design-vector-art_1138841-23139.jpg?w=360',
                           height: 150,
-                          color: Colors.grey.shade300,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            height: 150,
+                            color: Colors.grey.shade300,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            height: 150,
+                            color: Colors.grey.shade300,
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.grey,
+                              size: 50,
+                            ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          height: 150,
-                          color: Colors.grey.shade300,
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                            size: 50,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Category: $category',
+                        style: const TextStyle(
+                            fontSize: 18, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '$discountPercentage% OFF',
+                        style: TextStyle(
+                          fontSize: 22,
+                          // color: hexToColor(colorHex),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today,
+                              size: 16, color: Colors.black54),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Valid till: ${formatValidityDate(validTill)}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black54),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 20),
+                      const Divider(),
+                      const Text(
+                        'Shop Details',
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Category: $category',
-                      style:
-                          const TextStyle(fontSize: 18, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '$discountPercentage% OFF',
-                      style: TextStyle(
-                        fontSize: 22,
-                        // color: hexToColor(colorHex),
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+                      Text(
+                        shopName,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 16, color: Colors.black54),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Valid till: ${formatValidityDate(validTill)}',
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.black54),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                    const Text(
-                      'Shop Details',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      shopName,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      shopCategory,
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '$shopCity, $shopState, $shopPincode',
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Contact Details',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Icon(Icons.person,
-                            size: 16, color: Colors.black54),
-                        const SizedBox(width: 5),
-                        Text(
-                          '$ownerFirstName $ownerLastName',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const Icon(Icons.phone,
-                            size: 16, color: Colors.black54),
-                        const SizedBox(width: 5),
-                        Text(phoneNumber, style: const TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    BlocBuilder<ProfileBloc, ProfileState>(
-                      builder: (context, state) {
-                        if (state is ProfileFetched) {
-                          if (state.type == 'customer') {
-                            var couponState =
-                                BlocProvider.of<CouponBloc>(context).state;
+                      const SizedBox(height: 5),
+                      Text(
+                        shopCategory,
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        '$shopCity, $shopState, $shopPincode',
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Contact Details',
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.person,
+                              size: 16, color: Colors.black54),
+                          const SizedBox(width: 5),
+                          Text(
+                            '$ownerFirstName $ownerLastName',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone,
+                              size: 16, color: Colors.black54),
+                          const SizedBox(width: 5),
+                          Text(phoneNumber,
+                              style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        builder: (context, state) {
+                          if (state is ProfileFetched) {
+                            if (state.type == 'customer') {
+                              var couponState =
+                                  BlocProvider.of<CouponBloc>(context).state;
 
-                            return SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (couponState is! CouponLoading) {
-                                    BlocProvider.of<CouponBloc>(context).add(
-                                        AvailCouponEvent(couponData['_id']));
-                                    BlocProvider.of<SingleCouponBloc>(context)
-                                        .add(GetCouponData(widget.id));
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: couponData['redeemed']
-                                      ? Colors.grey.shade400
-                                      : AppColors.primaryColor,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40.0, vertical: 15.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0),
+                              return SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (couponState is! CouponLoading) {
+                                      BlocProvider.of<CouponBloc>(context).add(
+                                          AvailCouponEvent(couponData['_id']));
+                                      BlocProvider.of<SingleCouponBloc>(context)
+                                          .add(GetCouponData(widget.id));
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: couponData['redeemed']
+                                        ? Colors.grey.shade400
+                                        : AppColors.primaryColor,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40.0, vertical: 15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
                                   ),
+                                  child: couponState is CouponLoading
+                                      ? const CircularProgressIndicator(
+                                          color: AppColors.primaryColor,
+                                        )
+                                      : Text(
+                                          couponData['redeemed']
+                                              ? 'Already availed'
+                                              : 'Redeem',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: couponData['redeemed']
+                                                ? Colors.grey.shade800
+                                                : Colors.white,
+                                          ),
+                                        ),
                                 ),
-                                child: couponState is CouponLoading
-                                    ? const CircularProgressIndicator()
-                                    : Text(
-                                        couponData['redeemed']
-                                            ? 'Already availed'
-                                            : 'Redeem',
+                              );
+                            }
+                          }
+                          return SizedBox();
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      BlocBuilder<ProfileBloc, ProfileState>(
+                        builder: (context, state) {
+                          if (state is ProfileFetched) {
+                            if (state.type == 'customer') {
+                              return SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () => showTransferDialog(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40.0, vertical: 15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Transfer Coupon',
                                         style: TextStyle(
                                           fontSize: 18,
-                                          color: couponData['redeemed']
-                                              ? Colors.grey.shade800
-                                              : Colors.white,
+                                          color: Colors.grey.shade800,
                                         ),
                                       ),
-                              ),
-                            );
-                          }
-                        }
-                        return SizedBox();
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    BlocBuilder<ProfileBloc, ProfileState>(
-                      builder: (context, state) {
-                        if (state is ProfileFetched) {
-                          if (state.type == 'customer') {
-                            return SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () => showTransferDialog(context),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40.0, vertical: 15.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0),
+                                      SizedBox(width: 12),
+                                      Icon(Icons.send),
+                                    ],
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Transfer Coupon',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.grey.shade800,
-                                      ),
-                                    ),
-                                    SizedBox(width: 12),
-                                    Icon(Icons.send),
-                                  ],
-                                ),
-                              ),
-                            );
+                              );
+                            }
                           }
-                        }
-                        return SizedBox();
-                      },
-                    ),
-                  ],
+                          return SizedBox();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

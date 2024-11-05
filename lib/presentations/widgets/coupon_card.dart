@@ -5,18 +5,18 @@ class CouponCard extends StatelessWidget {
   final int discountPercent;
   final String? id;
   final String title;
+  final String? category;
   final bool active;
   final String? buttonTitle;
   final Color? color;
-  final String? subtitle;
   final VoidCallback? onTap;
   final int? price;
   final DateTime? validity;
   const CouponCard({
     required this.title,
-    this.subtitle,
     this.onTap,
     this.buttonTitle,
+    this.category,
     this.id,
     this.price,
     this.color,
@@ -79,18 +79,12 @@ class CouponCard extends StatelessWidget {
                     ),
                     Text(
                       title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: cardColor,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      subtitle ?? "ADMIT ONE",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -140,12 +134,12 @@ class CouponCard extends StatelessWidget {
                 color: Colors.grey.shade700,
                 borderRadius: BorderRadius.circular(4.0),
               ),
-              child: const Text(
-                'Electronics',
+              child: Text(
+                category ?? "",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: category != null ? 12 : 0,
                 ),
               ),
             ),

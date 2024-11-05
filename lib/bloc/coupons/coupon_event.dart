@@ -8,9 +8,12 @@ abstract class CouponEvent extends Equatable {
 }
 
 class GetAllCoupons extends CouponEvent {
-  final String? state;
-  const GetAllCoupons({this.state = 'all'});
+  final String? city;
+  final String? search;
+  const GetAllCoupons({this.city = 'all', this.search});
 }
+
+class GetLanding extends CouponEvent {}
 
 class FilterCoupons extends CouponEvent {
   final String category;

@@ -53,39 +53,47 @@ class _ManageCouponsState extends State<ManageCoupons>
         body: TabBarView(
           controller: _tabController,
           children: [
-            BlocBuilder<CouponBloc, CouponState>(
-              builder: (context, state) {
-                if (state is CouponLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ManageCouponLoaded) {
-                  final activeCoupons = state.coupons
-                      .where((coupon) =>
-                          coupon['couponDetail'][0]['status'] == 'REDEEMED')
-                      .toList();
-                  return buildCouponList(coupons: activeCoupons);
-                } else if (state is CouponFailed) {
-                  return Center(child: Text(state.error));
-                } else {
-                  return const Center(child: Text('No coupons found.'));
-                }
-              },
+            RefreshIndicator(
+              onRefresh: () async => BlocProvider.of<CouponBloc>(context)
+                  .add(GetPartnerActiveCoupons()),
+              child: BlocBuilder<CouponBloc, CouponState>(
+                builder: (context, state) {
+                  if (state is CouponLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is ManageCouponLoaded) {
+                    final activeCoupons = state.coupons
+                        .where((coupon) =>
+                            coupon['couponDetail'][0]['status'] == 'REDEEMED')
+                        .toList();
+                    return buildCouponList(coupons: activeCoupons);
+                  } else if (state is CouponFailed) {
+                    return Center(child: Text(state.error));
+                  } else {
+                    return const Center(child: Text('No coupons found.'));
+                  }
+                },
+              ),
             ),
-            BlocBuilder<CouponBloc, CouponState>(
-              builder: (context, state) {
-                if (state is CouponLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ManageCouponLoaded) {
-                  final unbilledCoupons = state.coupons
-                      .where((coupon) =>
-                          coupon['couponDetail'][0]['status'] == 'ACTIVE')
-                      .toList();
-                  return buildCouponList(coupons: unbilledCoupons);
-                } else if (state is CouponFailed) {
-                  return Center(child: Text(state.error));
-                } else {
-                  return const Center(child: Text('No coupons found.'));
-                }
-              },
+            RefreshIndicator(
+              onRefresh: () async => BlocProvider.of<CouponBloc>(context)
+                  .add(GetPartnerActiveCoupons()),
+              child: BlocBuilder<CouponBloc, CouponState>(
+                builder: (context, state) {
+                  if (state is CouponLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is ManageCouponLoaded) {
+                    final unbilledCoupons = state.coupons
+                        .where((coupon) =>
+                            coupon['couponDetail'][0]['status'] == 'ACTIVE')
+                        .toList();
+                    return buildCouponList(coupons: unbilledCoupons);
+                  } else if (state is CouponFailed) {
+                    return Center(child: Text(state.error));
+                  } else {
+                    return const Center(child: Text('No coupons found.'));
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -100,38 +108,35 @@ class _ManageCouponsState extends State<ManageCoupons>
       return const Center(child: Text('No coupons available.'));
     }
 
-    return SizedBox(
-      height: 400,
-      child: ListView.builder(
-        itemCount: coupons.length,
-        itemBuilder: (context, index) {
-          var coupon = coupons[index];
-          return Card(
-            margin: const EdgeInsets.all(10.0),
-            child: ListTile(
-              trailing: coupon['couponDetail'][0]['status'] == 'ACTIVE'
-                  ? IconButton(
-                      onPressed: () {
-                        _showAddAmountDialog(
-                            context,
-                            coupon['couponDetail'][0]['_id'],
-                            coupon['consumerData']['id']);
-                      },
-                      icon: const Icon(Icons.keyboard_double_arrow_right),
-                    )
-                  : const SizedBox(),
-              title: Text(
-                coupon['consumerData']['firstname'] +
-                    " " +
-                    (coupon['consumerData']['lastname'] ?? 'Unknown'),
-              ),
-              subtitle: Text(coupon['couponDetail'][0]['status'] == 'REDEEMED'
-                  ? 'REDEEMED'
-                  : "₹${coupon['couponDetail'][0]['totalPrice']}"),
+    return ListView.builder(
+      itemCount: coupons.length,
+      itemBuilder: (context, index) {
+        var coupon = coupons[index];
+        return Card(
+          margin: const EdgeInsets.all(10.0),
+          child: ListTile(
+            trailing: coupon['couponDetail'][0]['status'] == 'ACTIVE'
+                ? IconButton(
+                    onPressed: () {
+                      _showAddAmountDialog(
+                          context,
+                          coupon['couponDetail'][0]['_id'],
+                          coupon['consumerData']['id']);
+                    },
+                    icon: const Icon(Icons.keyboard_double_arrow_right),
+                  )
+                : const SizedBox(),
+            title: Text(
+              coupon['consumerData']['firstname'] +
+                  " " +
+                  (coupon['consumerData']['lastname'] ?? 'Unknown'),
             ),
-          );
-        },
-      ),
+            subtitle: Text(coupon['couponDetail'][0]['status'] == 'REDEEMED'
+                ? 'REDEEMED'
+                : "₹${coupon['couponDetail'][0]['totalPrice']}"),
+          ),
+        );
+      },
     );
   }
 

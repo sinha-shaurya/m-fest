@@ -11,6 +11,22 @@ class AuthInitial extends AuthState {}
 
 class AuthSuccess extends AuthState {}
 
+class AuthNetworkError extends AuthState {
+  final String message;
+  const AuthNetworkError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
+class AuthInvalidCredentials extends AuthState {
+  final String message;
+  const AuthInvalidCredentials(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class AuthLoading extends AuthState {}
 
 class AuthRegistered extends AuthState {}

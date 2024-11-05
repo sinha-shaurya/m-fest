@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,6 +49,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         emit(AuthFailed('Invalid credentials'));
       }
+    } on SocketException {
+      emit(AuthNetworkError('Network error'));
     } catch (error) {
       emit(AuthFailed('Unknown error occurred.'));
     }
@@ -181,7 +184,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
       if (token != null) {
         final response = await http.get(
           Uri.parse('$baseUrl/api/auth/profile-data'),
