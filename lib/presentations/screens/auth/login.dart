@@ -39,6 +39,11 @@ class _LoginPageState extends State<LoginPage> {
             content: Text(state.message),
             backgroundColor: AppColors.errorColor,
           ));
+        } else if (state is AuthNetworkError) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(state.message),
+            backgroundColor: AppColors.errorColor,
+          ));
         } else if (state is AuthNotApproved) {
           Navigator.pushAndRemoveUntil(
               context,

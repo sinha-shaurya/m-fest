@@ -15,7 +15,6 @@ import 'package:aash_india/presentations/widgets/privacy_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -169,8 +168,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: 20),
                       _buildSettingsSection(state.type == 'partner'),
-                      const SizedBox(height: 20),
-                      _buildFooter(),
                     ],
                   ),
                 ),
@@ -233,16 +230,6 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          !isPartner
-              ? ListTile(
-                  title: Text("Transfer Coupon"),
-                  leading: Icon(Icons.swap_horiz),
-                  onTap: () {
-                    showTransferDialog(context);
-                  },
-                )
-              : const SizedBox(),
-          !isPartner ? const Divider() : const SizedBox(),
           // const ListTile(
           //   leading: Icon(Icons.replay),
           //   title: Text('Change Password'),
@@ -299,51 +286,6 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () {
               BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return SizedBox(
-      height: 60,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Designed & Developed by',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () async {
-                  const url = 'https://www.instagram.com/_sonu.hansda_';
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-                child: const Text('Sonu Hansda'),
-              ),
-              const Text(' & '),
-              GestureDetector(
-                onTap: () async {
-                  const url = 'https://www.instagram.com/ayush.kr._singh';
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-                child: const Text('Ayush Singh'),
-              ),
-            ],
           ),
         ],
       ),

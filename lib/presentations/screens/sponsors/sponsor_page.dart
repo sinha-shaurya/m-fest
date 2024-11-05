@@ -156,6 +156,7 @@ class _SponsorPageState extends State<SponsorPage> {
       },
       child: Container(
         padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),

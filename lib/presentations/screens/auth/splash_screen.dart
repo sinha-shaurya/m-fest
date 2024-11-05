@@ -2,9 +2,9 @@ import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
-import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/home/complete_profile.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
+import 'package:aash_india/presentations/screens/landing/landing_page.dart';
 import 'package:aash_india/presentations/screens/profile/waiting_approval.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,35 +23,68 @@ class SplashScreenState extends State<SplashScreen> {
     BlocProvider.of<AuthBloc>(context).add(AuthCheck());
   }
 
+  void _navigateToHome(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void _navigateToLanding(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LandingPage()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void _navigateToWaitingApproval(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WaitingApproval()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  void _navigateToCompleteProfile(BuildContext context, AuthIncomplete state) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CompleteProfile(
+          name: state.name,
+          isCustomer: state.isCustomer,
+        ),
+      ),
+    );
+  }
+
+  void _handleError(BuildContext context, AuthFailed state) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(state.message),
+      backgroundColor: AppColors.errorColor,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          _navigateToHome(context);
+          return;
         } else if (state is AuthNotApproved) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => WaitingApproval()),
-              (Route<dynamic> route) => false);
+          _navigateToWaitingApproval(context);
+          return;
         } else if (state is AuthIncomplete) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CompleteProfile(
-                isCustomer: state.isCustomer,
-                name: state.name,
-              ),
-            ),
-          );
+          _navigateToCompleteProfile(context, state);
+          return;
+        } else if (state is AuthFailed) {
+          _handleError(context, state);
+          return;
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
+          _navigateToLanding(context);
+          return;
         }
       },
       child: const Scaffold(

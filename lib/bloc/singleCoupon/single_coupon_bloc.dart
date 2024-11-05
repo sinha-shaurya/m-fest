@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
@@ -38,6 +39,8 @@ class SingleCouponBloc extends Bloc<SingleCouponEvent, SingleCouponState> {
           'status': event.end ? 2 : 1,
         }),
       );
+      log('coupon id: ${event.couponId}');
+      log('owner id: ${event.ownerId}');
       if (couponResponse.statusCode == 200) {
         emit(ScanSuccess(
             event.end ? "Transaction completed" : "Coupon activated"));
@@ -100,11 +103,11 @@ class SingleCouponBloc extends Bloc<SingleCouponEvent, SingleCouponState> {
           if (availedResponse.statusCode == 200) {
             final List<dynamic> availedCoupons =
                 jsonDecode(availedResponse.body);
-            isRedeemed = availedCoupons
-                .any((coupon) => coupon['consumerId'] == event.id);
+            isRedeemed =
+                availedCoupons.any((coupon) => coupon['couponId'] == event.id);
           }
-
           couponData['redeemed'] = isRedeemed;
+          log(isRedeemed.toString());
 
           emit(SingleCouponLoaded(
             couponData: couponData,

@@ -3,7 +3,6 @@ import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
@@ -18,20 +17,9 @@ class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
       GetAllSponsors event, Emitter<SponsorState> emit) async {
     emit(SponsorLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        emit(SponsorFailed('Unable to fetch sponsors'));
-        return;
-      }
-
       final response = await http.get(
         Uri.parse('$baseUrl/api/link'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {

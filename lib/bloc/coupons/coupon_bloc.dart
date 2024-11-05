@@ -19,35 +19,102 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     on<GetPartnerActiveCoupons>(_onPartnerActiveCouponFetch);
     on<UpdateCouponAmount>(_onUpdateCouponAmount);
     on<TransferCouponEvent>(_onTransferCoupon);
+    on<GetLanding>(_fetchLanding);
   }
 
   final String baseUrl =
       dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+
+  Future<List<String>> fetchCities() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/coupon/get-cities'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['cities'] != null) {
+          return List<String>.from(data['cities']);
+        } else {
+          return [];
+        }
+      } else {
+        throw Exception(
+            'Failed to load cities. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+      return Future.error('Error fetching cities');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchLandingCoupons() async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/api/landing/get-coupuns'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      throw Exception('Failed to load coupons');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchLandingShops() async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/api/landing/get-shops'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      throw Exception('Failed to load shops');
+    }
+  }
+
+  Future<void> _fetchLanding(
+      GetLanding event, Emitter<CouponState> emit) async {
+    emit(CouponLoading());
+    try {
+      final List<Map<String, dynamic>> coupons = await _fetchLandingCoupons();
+      final List<Map<String, dynamic>> shops = await _fetchLandingShops();
+
+      emit(LandingLoaded(coupons: coupons, shops: shops));
+    } catch (error) {
+      emit(CouponFailed('Failed to load landing data: ${error.toString()}'));
+    }
+  }
 
   Future<void> _fetchAllCoupons(
       GetAllCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final selectedState = prefs.getString('selectedState');
-      if (selectedState == null || selectedState != event.state) {
-        await prefs.setString('selectedState', event.state ?? 'all');
+      final selectedCity = prefs.getString('selectedCity');
+      if (event.city != null) {
+        if (selectedCity == null || selectedCity != event.city) {
+          await prefs.setString('selectedState', event.city ?? "Ranchi");
+          log(event.city.toString());
+        }
       }
       final token = prefs.getString('token');
-
       if (token == null) {
         emit(CouponFailed('Unable to fetch coupons'));
         return;
       }
-
+      final uri = Uri.parse('$baseUrl/api/coupon/getall').replace(
+          queryParameters: {'city': event.city, 'search': event.search});
       final response = await http.get(
-        Uri.parse('$baseUrl/api/coupon/getall?state=$selectedState'),
+        uri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token'
         },
       );
-
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
         final List<Map<String, dynamic>> coupons =
@@ -142,7 +209,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
             },
             "couponDetail": coupon["couponDetail"].map((detail) {
               return {
-                "consumerId": detail["consumerId"],
+                "couponId": detail["couponId"],
                 "status": detail["status"],
                 "totalPrice": detail["totalPrice"],
                 "_id": detail["_id"],
@@ -151,7 +218,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
             }).toList()
           };
         }).toList();
-        log(couponList.toString());
         emit(ManageCouponLoaded(couponList));
       } else {
         emit(CouponFailed('Failed to fetch availed coupons.'));
@@ -323,9 +389,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           emit(CouponFailed('Unable to fetch coupons'));
           return;
         }
-        final selectedState = prefs.getString('selectedState');
+        final selectedCity = prefs.getString('selectedCity');
+        final uri = Uri.parse('$baseUrl/api/coupon/getall')
+            .replace(queryParameters: {'city': selectedCity});
         final response = await http.get(
-          Uri.parse('$baseUrl/api/coupon/getall?state=$selectedState'),
+          uri,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',

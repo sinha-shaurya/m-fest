@@ -39,37 +39,46 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
       body: TabBarView(
         controller: _tabController,
         children: [
-          BlocBuilder<CouponBloc, CouponState>(
-            builder: (context, state) {
-              if (state is CouponLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is CouponLoaded) {
-                final activeCoupons = state.coupons
-                    .where((coupon) => coupon['status'] != 'EXPIRED')
-                    .toList();
-                return buildCouponList(coupons: activeCoupons);
-              } else if (state is CouponFailed) {
-                return Center(child: Text(state.error));
-              } else {
-                return const Center(child: Text('No availed coupons found.'));
-              }
-            },
+          RefreshIndicator(
+            onRefresh: () async =>
+                BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons()),
+            child: BlocBuilder<CouponBloc, CouponState>(
+              builder: (context, state) {
+                if (state is CouponLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is CouponLoaded) {
+                  final activeCoupons = state.coupons
+                      .where((coupon) => coupon['status'] != 'EXPIRED')
+                      .toList();
+                  return buildCouponList(coupons: activeCoupons);
+                } else if (state is CouponFailed) {
+                  return Center(child: Text(state.error));
+                } else {
+                  return const Center(child: Text('No availed coupons found.'));
+                }
+              },
+            ),
           ),
-          BlocBuilder<CouponBloc, CouponState>(
-            builder: (context, state) {
-              if (state is CouponLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is CouponLoaded) {
-                final expiredCoupons = state.coupons
-                    .where((coupon) => coupon['status'] == 'EXPIRED')
-                    .toList();
-                return buildCouponList(coupons: expiredCoupons);
-              } else if (state is CouponFailed) {
-                return Center(child: Text(state.error));
-              } else {
-                return const Center(child: Text('No coupons found.'));
-              }
-            },
+          RefreshIndicator(
+            onRefresh: () async =>
+                BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons()),
+            child: BlocBuilder<CouponBloc, CouponState>(
+              builder: (context, state) {
+                if (state is CouponLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is CouponLoaded) {
+                  final expiredCoupons = state.coupons
+                      .where((coupon) => coupon['status'] == 'EXPIRED')
+                      .toList();
+                  return buildCouponList(
+                      coupons: expiredCoupons, expired: true);
+                } else if (state is CouponFailed) {
+                  return Center(child: Text(state.error));
+                } else {
+                  return const Center(child: Text('No coupons found.'));
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -94,7 +103,7 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                   builder: (context) => QRScannerScreen(
-                    couponId: coupon['_id'],
+                    couponId: coupon['couponId'],
                   ),
                 ),
               );
@@ -103,20 +112,18 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                   builder: (context) => QRScannerScreen(
-                    couponId: coupon['_id'],
+                    couponId: coupon['couponId'],
                     end: coupon['totalPrice'] > 0,
                   ),
                 ),
               );
             }
           },
+          color: expired ? Colors.grey.shade600 : null,
           id: coupon['_id'],
           buttonTitle: coupon["status"] == "REDEEMED"
               ? "Scan"
               : "₹${coupon['totalPrice']}",
-          // color: coupon['status'] == 'EXPIRED'
-          //     ? Colors.grey.shade600
-          //     : hexToColor(coupon['style']?['color'] ?? '#FFFFFF'),
           title: coupon['title'],
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],
