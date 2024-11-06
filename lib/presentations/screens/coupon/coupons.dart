@@ -103,7 +103,7 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                   builder: (context) => QRScannerScreen(
-                    couponId: coupon['couponId'],
+                    couponId: coupon['_id'],
                   ),
                 ),
               );
@@ -112,7 +112,7 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                   builder: (context) => QRScannerScreen(
-                    couponId: coupon['couponId'],
+                    couponId: coupon['_id'],
                     end: coupon['totalPrice'] > 0,
                   ),
                 ),

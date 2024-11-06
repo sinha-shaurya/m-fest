@@ -33,6 +33,7 @@ class AppDrawer extends StatelessWidget {
                   children: [
                     Text(
                       'Aash India',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28,
