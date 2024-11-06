@@ -164,8 +164,6 @@ class _ManageCouponsState extends State<ManageCoupons>
             ElevatedButton(
               onPressed: () {
                 String enteredAmount = amountController.text;
-
-                // Dispatch UpdateCouponAmount event here
                 context.read<CouponBloc>().add(
                       UpdateCouponAmount(
                         consumerId: consumerId,

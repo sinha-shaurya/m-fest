@@ -104,11 +104,14 @@ class _HomePageState extends State<HomePage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Aash India'),
+            title: Image.asset(
+              'assets/logo.png',
+              height: 80,
+            ),
+            centerTitle: true,
             backgroundColor: AppColors.primaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
-            centerTitle: true,
             leading: Builder(
               builder: (context) => IconButton(
                 onPressed: () {

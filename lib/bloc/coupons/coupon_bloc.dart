@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
@@ -98,7 +97,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       if (event.city != null) {
         if (selectedCity == null || selectedCity != event.city) {
           await prefs.setString('selectedState', event.city ?? "Ranchi");
-          log(event.city.toString());
         }
       }
       final token = prefs.getString('token');

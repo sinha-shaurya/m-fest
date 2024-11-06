@@ -247,8 +247,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -376,8 +375,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -572,8 +570,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 15, horizontal: 120),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
