@@ -9,7 +9,6 @@ class AppColors {
   static const Color buttonTextColor = Colors.white;
 }
 
-// Define text styles
 class AppTextStyles {
   static const TextStyle heading = TextStyle(
     fontSize: 24,

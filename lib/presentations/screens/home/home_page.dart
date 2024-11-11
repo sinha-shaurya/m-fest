@@ -18,9 +18,7 @@ import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/app_drawer.dart';
-import 'package:aash_india/presentations/widgets/banner_carousel.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
-import 'package:aash_india/presentations/widgets/coupon_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,6 +60,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadCities() async {
     try {
       cities = await CouponBloc().fetchCities();
+      if (cities.isNotEmpty) {
+        cities = ["All"] + cities;
+      }
       final SharedPreferences pref = await SharedPreferences.getInstance();
       String? city = pref.getString('selectedCity');
       setState(() {
@@ -121,29 +122,31 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             actions: [
+              Text(selectedCity ?? 'All'),
               cities.isNotEmpty
-                  ? DropdownButton<String>(
-                      value: selectedCity,
+                  ? PopupMenuButton<String>(
                       icon: Icon(Icons.pin_drop, color: Colors.white),
-                      dropdownColor: AppColors.primaryColor,
-                      underline: SizedBox.shrink(),
-                      onChanged: (String? newValue) {
+                      onSelected: (String newValue) {
                         setState(() {
                           selectedCity = newValue;
                         });
                         BlocProvider.of<CouponBloc>(context)
                             .add(GetAllCoupons(city: newValue));
                       },
-                      items:
-                          cities.map<DropdownMenuItem<String>>((String city) {
-                        return DropdownMenuItem<String>(
-                          value: city,
-                          child: Text(
-                            city,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList(),
+                      itemBuilder: (BuildContext context) {
+                        return cities
+                            .map((String city) => city)
+                            .toList()
+                            .map<PopupMenuItem<String>>((String city) {
+                          return PopupMenuItem<String>(
+                            value: city,
+                            child: Text(
+                              city,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          );
+                        }).toList();
+                      },
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -170,64 +173,64 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BannerCarousel(),
                         const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 10.0),
+                        _buildSearch(context),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4)),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: searchController,
-                                  decoration: InputDecoration(
-                                    hintText: 'Search...',
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Colors.grey.shade400),
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(12),
-                                            bottomLeft: Radius.circular(12))),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(12),
-                                            bottomLeft: Radius.circular(12))),
-                                  ),
+                              GestureDetector(
+                                onTap: () {
+                                  BlocProvider.of<NavigationBloc>(context)
+                                      .add(PageTapped(2));
+                                },
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.shopping_bag,
+                                        color: AppColors.primaryColor),
+                                    const SizedBox(height: 4),
+                                    Text('Coupons'),
+                                  ],
                                 ),
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (searchController.text.isNotEmpty) {
-                                    BlocProvider.of<CouponBloc>(context).add(
-                                      GetAllCoupons(
-                                          city: selectedCity,
-                                          search: searchController.text),
-                                    );
-                                  } else if (searchController.text.isEmpty) {
-                                    BlocProvider.of<CouponBloc>(context).add(
-                                      GetAllCoupons(city: selectedCity),
-                                    );
-                                  }
+                              GestureDetector(
+                                onTap: () {
+                                  BlocProvider.of<NavigationBloc>(context)
+                                      .add(PageTapped(1));
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.all(16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(12),
-                                        bottomRight: Radius.circular(12)),
-                                  ),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.pages,
+                                        color: AppColors.primaryColor),
+                                    const SizedBox(height: 4),
+                                    Text('Banners'),
+                                  ],
                                 ),
-                                child: Icon(Icons.search),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  BlocProvider.of<NavigationBloc>(context)
+                                      .add(PageTapped(3));
+                                },
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.person,
+                                        color: AppColors.primaryColor),
+                                    const SizedBox(height: 4),
+                                    Text('Profile'),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         BlocBuilder<ProfileBloc, ProfileState>(
                           builder: (context, state) {
                             if (state is ProfileFetched) {
@@ -247,83 +250,7 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                         const SizedBox(height: 10),
-                        BlocBuilder<ProfileBloc, ProfileState>(
-                          builder: (context, state) {
-                            if (state is ProfileFetched) {
-                              if (state.type == 'customer') {
-                                return SizedBox(
-                                  height: 60,
-                                  child: ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                      CategoryItem(
-                                        onTap: () {
-                                          if (activeCategory != 'All') {
-                                            BlocProvider.of<CouponBloc>(context)
-                                                .add(FilterCoupons('All'));
-                                            setState(() {
-                                              activeCategory = 'All';
-                                            });
-                                          }
-                                        },
-                                        name: 'All',
-                                        icon: Icons.shopping_bag,
-                                        isActive: activeCategory == 'All',
-                                      ),
-                                      CategoryItem(
-                                        name: 'Fashion',
-                                        icon: Icons.woman,
-                                        isActive: activeCategory == 'Fashion',
-                                        onTap: () {
-                                          if (activeCategory != 'Fashion') {
-                                            BlocProvider.of<CouponBloc>(context)
-                                                .add(FilterCoupons('Fashion'));
-                                            setState(() {
-                                              activeCategory = 'Fashion';
-                                            });
-                                          }
-                                        },
-                                      ),
-                                      CategoryItem(
-                                        name: 'Appliances',
-                                        icon: Icons.cookie_rounded,
-                                        isActive:
-                                            activeCategory == 'Appliances',
-                                        onTap: () {
-                                          if (activeCategory != 'Appliances') {
-                                            BlocProvider.of<CouponBloc>(context)
-                                                .add(FilterCoupons(
-                                                    'Appliances'));
-                                            setState(() {
-                                              activeCategory = 'Appliances';
-                                            });
-                                          }
-                                        },
-                                      ),
-                                      CategoryItem(
-                                        name: 'Electronics',
-                                        icon: Icons.devices,
-                                        isActive:
-                                            activeCategory == 'Electronics',
-                                        onTap: () {
-                                          if (activeCategory != 'Electronics') {
-                                            BlocProvider.of<CouponBloc>(context)
-                                                .add(FilterCoupons(
-                                                    'Electronics'));
-                                            setState(() {
-                                              activeCategory = 'Electronics';
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            }
-                            return SizedBox();
-                          },
-                        ),
+                        _buildCategories(),
                         const SizedBox(height: 10),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -333,13 +260,19 @@ class _HomePageState extends State<HomePage> {
                                 if (state.coupons.isEmpty) {
                                   return Text("No coupons available");
                                 }
-                                return ListView.builder(
+                                return GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 6,
+                                    mainAxisSpacing: 6,
+                                  ),
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: state.coupons.length,
                                   itemBuilder: (context, index) {
-                                    return CouponCard(
-                                      id: state.coupons[index]['_id'],
+                                    final coupon = state.coupons[index];
+                                    return GestureDetector(
                                       onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -348,16 +281,45 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      title: state.coupons[index]['title'],
-                                      category: state.coupons[index]['category']
-                                          [0],
-                                      discountPercent: state.coupons[index]
-                                          ['discountPercentage'],
-                                      active: state.coupons[index]['active'],
-                                      validity: DateTime.parse(
-                                          state.coupons[index]['validTill']),
-                                      price:
-                                          state.coupons[index]['price'] ?? 100,
+                                      child: Card(
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "${coupon['discountPercentage']}%",
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.primaryColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              coupon['title'].toString(),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.store,
+                                                    color:
+                                                        Colors.grey.shade700),
+                                                const SizedBox(width: 4),
+                                                Text('shop'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     );
                                   },
                                 );
@@ -375,61 +337,210 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               } else if (state is NavigationCategories) {
-                return SponsorPage();
-              } else if (state is NavigationCoupon) {
-                return BlocBuilder<ProfileBloc, ProfileState>(
-                  builder: (context, state) {
-                    if (state is ProfileFetched) {
-                      if (state.type == 'customer') return Coupons();
-                      return ManageCoupons();
-                    }
-                    return const Center(
-                      child: Text('Error Fetching'),
-                    );
+                return PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) {
+                    BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
                   },
+                  child: SponsorPage(),
+                );
+              } else if (state is NavigationCoupon) {
+                return PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) {
+                    BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
+                  },
+                  child: BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, state) {
+                      if (state is ProfileFetched) {
+                        if (state.type == 'customer') return Coupons();
+                        return ManageCoupons();
+                      }
+                      return const Center(
+                        child: Text('Error Fetching'),
+                      );
+                    },
+                  ),
                 );
               } else if (state is NavigationProfile) {
-                return ProfilePage();
+                return PopScope(
+                    canPop: false,
+                    onPopInvokedWithResult: (didPop, result) {
+                      BlocProvider.of<NavigationBloc>(context)
+                          .add(PageTapped(0));
+                    },
+                    child: ProfilePage());
               }
               return Container();
             },
           ),
-          bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
-            builder: (context, state) {
-              return BottomNavigationBar(
-                currentIndex: _getSelectedIndex(state),
-                onTap: (index) {
-                  if (index == 0 && !isPartner) {
-                    BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
-                  }
-                  BlocProvider.of<NavigationBloc>(context)
-                      .add(PageTapped(index));
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
+          // bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
+          //   builder: (context, state) {
+          //     return BottomNavigationBar(
+          //       currentIndex: _getSelectedIndex(state),
+          //       onTap: (index) {
+          //         if (index == 0 && !isPartner) {
+          //           BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+          //         }
+          //         BlocProvider.of<NavigationBloc>(context)
+          //             .add(PageTapped(index));
+          //       },
+          //       items: [
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.home),
+          //           label: 'Home',
+          //         ),
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.pages),
+          //           label: 'Banners',
+          //         ),
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.topic),
+          //           label: 'Coupons',
+          //         ),
+          //         BottomNavigationBarItem(
+          //           icon: Icon(Icons.person),
+          //           label: 'Profile',
+          //         ),
+          //       ],
+          //       selectedItemColor: appTheme(context).primaryColor,
+          //       unselectedItemColor: Colors.grey,
+          //       type: BottomNavigationBarType.fixed,
+          //     );
+          //   },
+          // ),
+        ),
+      ),
+    );
+  }
+
+  BlocBuilder<ProfileBloc, ProfileState> _buildCategories() {
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileFetched) {
+          if (state.type == 'customer') {
+            return SizedBox(
+              height: 60,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  CategoryItem(
+                    onTap: () {
+                      if (activeCategory != 'All') {
+                        BlocProvider.of<CouponBloc>(context)
+                            .add(FilterCoupons('All'));
+                        setState(() {
+                          activeCategory = 'All';
+                        });
+                      }
+                    },
+                    name: 'All',
+                    icon: Icons.shopping_bag,
+                    isActive: activeCategory == 'All',
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.pages),
-                    label: 'Banners',
+                  CategoryItem(
+                    name: 'Fashion',
+                    icon: Icons.woman,
+                    isActive: activeCategory == 'Fashion',
+                    onTap: () {
+                      if (activeCategory != 'Fashion') {
+                        BlocProvider.of<CouponBloc>(context)
+                            .add(FilterCoupons('Fashion'));
+                        setState(() {
+                          activeCategory = 'Fashion';
+                        });
+                      }
+                    },
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.topic),
-                    label: 'Coupons',
+                  CategoryItem(
+                    name: 'Appliances',
+                    icon: Icons.cookie_rounded,
+                    isActive: activeCategory == 'Appliances',
+                    onTap: () {
+                      if (activeCategory != 'Appliances') {
+                        BlocProvider.of<CouponBloc>(context)
+                            .add(FilterCoupons('Appliances'));
+                        setState(() {
+                          activeCategory = 'Appliances';
+                        });
+                      }
+                    },
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Profile',
+                  CategoryItem(
+                    name: 'Electronics',
+                    icon: Icons.devices,
+                    isActive: activeCategory == 'Electronics',
+                    onTap: () {
+                      if (activeCategory != 'Electronics') {
+                        BlocProvider.of<CouponBloc>(context)
+                            .add(FilterCoupons('Electronics'));
+                        setState(() {
+                          activeCategory = 'Electronics';
+                        });
+                      }
+                    },
                   ),
                 ],
-                selectedItemColor: appTheme(context).primaryColor,
-                unselectedItemColor: Colors.grey,
-                type: BottomNavigationBarType.fixed,
-              );
-            },
+              ),
+            );
+          }
+        }
+        return SizedBox();
+      },
+    );
+  }
+
+  Padding _buildSearch(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                filled: true,
+                fillColor: Colors.white,
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12))),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        bottomLeft: Radius.circular(12))),
+              ),
+            ),
           ),
-        ),
+          ElevatedButton(
+            onPressed: () {
+              if (searchController.text.isNotEmpty) {
+                BlocProvider.of<CouponBloc>(context).add(
+                  GetAllCoupons(
+                      city: selectedCity, search: searchController.text),
+                );
+              } else if (searchController.text.isEmpty) {
+                BlocProvider.of<CouponBloc>(context).add(
+                  GetAllCoupons(city: selectedCity),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(12),
+                    bottomRight: Radius.circular(12)),
+              ),
+            ),
+            child: Icon(Icons.search),
+          ),
+        ],
       ),
     );
   }
