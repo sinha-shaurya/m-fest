@@ -1,5 +1,8 @@
 import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
 import 'package:aash_india/bloc/appdata/app_data_state.dart';
+import 'package:aash_india/bloc/auth/auth_bloc.dart';
+import 'package:aash_india/bloc/auth/auth_event.dart';
+import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
 import 'package:aash_india/core/constants/theme.dart';
@@ -123,6 +126,24 @@ class AppDrawer extends StatelessWidget {
                       message,
                       subject: 'Get Exciting Discounts with Aash India!',
                     );
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text('Logout'),
+                  trailing: BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      if (state is AuthLoading) {
+                        return CircularProgressIndicator(
+                          color: Colors.grey.shade600,
+                        );
+                      }
+                      return const SizedBox();
+                    },
+                  ),
+                  onTap: () {
+                    BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
                   },
                 ),
                 Divider(),
