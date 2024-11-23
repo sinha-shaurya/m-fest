@@ -40,9 +40,19 @@ class _SignUpState extends State<SignUp> {
       },
       child: Scaffold(
         body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFa7c957),
+                    Color(0xFF386641),
+                  ],
+                ),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -55,7 +65,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     child: ToggleButtons(
                       borderRadius: BorderRadius.circular(25.0),
-                      fillColor: AppColors.primaryColor,
+                      fillColor: Color(0xFF386641),
                       selectedColor: Colors.white,
                       color: Colors.black,
                       isSelected: [isCustomer, !isCustomer],
@@ -86,7 +96,7 @@ class _SignUpState extends State<SignUp> {
                   Container(
                     padding: const EdgeInsets.all(36),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white54,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(width: 0.25),
                     ),
@@ -97,9 +107,13 @@ class _SignUpState extends State<SignUp> {
                         TextField(
                           controller: _nameController,
                           decoration: InputDecoration(
+                            fillColor: Colors.white60,
+                            filled: true,
                             focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                              borderSide: BorderSide(
+                                color: Color(0xFF386641),
+                              ),
+                            ),
                             labelText: "Name",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -111,9 +125,13 @@ class _SignUpState extends State<SignUp> {
                         TextField(
                           controller: _emailController,
                           decoration: InputDecoration(
+                            fillColor: Colors.white60,
+                            filled: true,
                             focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                              borderSide: BorderSide(
+                                color: Color(0xFF386641),
+                              ),
+                            ),
                             labelText: "Email",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -126,9 +144,12 @@ class _SignUpState extends State<SignUp> {
                           controller: _passwordController,
                           obscureText: showPassword,
                           decoration: InputDecoration(
+                            fillColor: Colors.white60,
+                            filled: true,
                             focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: AppColors.primaryColor),
+                              borderSide: BorderSide(
+                                color: Color(0xFF386641),
+                              ),
                             ),
                             labelText: "Password",
                             border: OutlineInputBorder(
@@ -155,9 +176,13 @@ class _SignUpState extends State<SignUp> {
                           controller: _confirmPassword,
                           obscureText: true,
                           decoration: InputDecoration(
+                            fillColor: Colors.white60,
+                            filled: true,
                             focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                              borderSide: BorderSide(
+                                color: Color(0xFF386641),
+                              ),
+                            ),
                             labelText: "Confirm Password",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -174,7 +199,7 @@ class _SignUpState extends State<SignUp> {
                             children: [
                               TextSpan(
                                 text: 'Terms & Policy',
-                                style: TextStyle(color: AppColors.primaryColor),
+                                style: TextStyle(color: Color(0xFF386641)),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     showDialog(
@@ -248,7 +273,7 @@ class _SignUpState extends State<SignUp> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
+                              backgroundColor: Color(0xFF386641),
                               padding: const EdgeInsets.symmetric(vertical: 15),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -275,14 +300,17 @@ class _SignUpState extends State<SignUp> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Already have an account?"),
+                      const Text(
+                        "Already have an account?",
+                        style: TextStyle(color: Colors.white60),
+                      ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop(context);
                         },
                         child: const Text(
                           "login",
-                          style: TextStyle(color: AppColors.primaryColor),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],

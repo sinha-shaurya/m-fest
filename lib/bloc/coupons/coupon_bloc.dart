@@ -38,7 +38,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['cities'] != null) {
-          return List<String>.from(data['cities']);
+          return List<String>.from(['All'] + data['cities']);
         } else {
           return [];
         }

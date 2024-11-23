@@ -66,24 +66,38 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: Color(0xFFa7c957),
         body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFa7c957),
+                    Color(0xFF386641),
+                  ],
+                ),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/logo.png'),
                   Text(
                     'Welcome back',
-                    style: TextStyle(fontSize: 32),
+                    style: TextStyle(fontSize: 32, color: Colors.white),
                   ),
-                  Text('Please enter your credentials to continue'),
+                  Text(
+                    'Please enter your credentials to continue',
+                    style: TextStyle(color: Colors.white60),
+                  ),
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(36),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.white54,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(width: 0.25),
                     ),
@@ -94,9 +108,14 @@ class _LoginPageState extends State<LoginPage> {
                         TextField(
                           controller: _emailController,
                           decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white60,
                             focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(
+                                color: Color(0xFF386641),
+                              ),
+                            ),
                             labelText: "Email",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -109,9 +128,11 @@ class _LoginPageState extends State<LoginPage> {
                           controller: _passwordController,
                           obscureText: true,
                           decoration: InputDecoration(
+                            fillColor: Colors.white60,
+                            filled: true,
                             focusedBorder: OutlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: AppColors.primaryColor)),
+                                    BorderSide(color: Color(0xFF386641))),
                             labelText: "Password",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -129,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: const Text(
                                 "forgot password ?",
-                                style: TextStyle(color: AppColors.primaryColor),
+                                style: TextStyle(color: Color(0xFF344e41)),
                               ),
                             ),
                           ],
@@ -157,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
+                              backgroundColor: Color(0xFF344e41),
                               padding: const EdgeInsets.symmetric(vertical: 15),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -184,7 +205,10 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Don't have an account?"),
+                      const Text(
+                        "Don't have an account?",
+                        style: TextStyle(color: Colors.white60),
+                      ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -192,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: const Text(
                           "Create New",
-                          style: TextStyle(color: AppColors.primaryColor),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ],

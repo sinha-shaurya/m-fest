@@ -66,12 +66,21 @@ class _LandingPageState extends State<LandingPage> {
             height: 80,
           ),
           centerTitle: true,
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: Color(0xFFa7c957),
           elevation: 0,
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFa7c957),
+                  Color(0xFF386641),
+                ],
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -80,18 +89,49 @@ class _LandingPageState extends State<LandingPage> {
                 const SizedBox(height: 20),
                 _buildCategoryIcons(),
                 const SizedBox(height: 20),
-                _buildSectionTitle('Available Coupons'),
-                const SizedBox(height: 10),
-                _buildCouponGrid(),
-                const SizedBox(height: 20),
-                _buildSectionTitle('Popular Shops'),
-                const SizedBox(height: 10),
-                _buildShopList(),
-                const SizedBox(height: 20),
-                _buildSectionTitle('Popular Restaurants'),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text('No restaurants available.'),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle('Available Coupons'),
+                      const SizedBox(height: 10),
+                      _buildCouponGrid(),
+                      const SizedBox(height: 20),
+                      _buildSectionTitle('Popular Shops'),
+                      const SizedBox(height: 10),
+                      _buildShopList(),
+                      const SizedBox(height: 20),
+                      _buildSectionTitle('Popular Restaurants'),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                height: 28,
+                              ),
+                              Icon(
+                                Icons.restaurant_outlined,
+                                size: 48,
+                                color: Colors.grey.shade800,
+                              ),
+                              Text(
+                                'No resturants available',
+                                style: TextStyle(color: Colors.grey.shade800),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -102,25 +142,28 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Widget _buildSearchBar() {
-    return TextField(
-      controller: searchController,
-      decoration: InputDecoration(
-        hintText: 'Search...',
-        filled: true,
-        fillColor: Colors.grey[200],
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade400),
-          borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          hintText: 'Search...',
+          filled: true,
+          fillColor: Colors.white54,
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF344e41)),
+            borderRadius: BorderRadius.all(Radius.circular(100)),
+          ),
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.all(Radius.circular(100)),
+          ),
+          prefixIcon: Icon(Icons.search, color: Color(0xFF344e41)),
         ),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        prefixIcon: Icon(Icons.search, color: AppColors.primaryColor),
+        onSubmitted: (value) {
+          _showLoginDialog();
+        },
       ),
-      onSubmitted: (value) {
-        _showLoginDialog();
-      },
     );
   }
 
@@ -128,17 +171,11 @@ class _LandingPageState extends State<LandingPage> {
     return GestureDetector(
       onTap: _showLoginDialog,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white54,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 5,
-            ),
-          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -155,7 +192,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget _buildIconWithLabel(IconData icon, String label) {
     return Column(
       children: [
-        Icon(icon, color: AppColors.primaryColor),
+        Icon(icon, color: Color(0xFF344e41)),
         const SizedBox(height: 4),
         Text(label),
       ],
@@ -167,7 +204,27 @@ class _LandingPageState extends State<LandingPage> {
       builder: (context, state) {
         if (state is LandingLoaded) {
           if (state.coupons.isEmpty) {
-            return const Center(child: Text("No coupons available"));
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 28,
+                  ),
+                  Icon(
+                    Icons.folder_outlined,
+                    size: 48,
+                    color: Colors.grey.shade800,
+                  ),
+                  Text(
+                    'No coupons available',
+                    style: TextStyle(color: Colors.grey.shade800),
+                  ),
+                ],
+              ),
+            );
           }
           return GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -220,7 +277,10 @@ class _LandingPageState extends State<LandingPage> {
             },
           );
         }
-        return const Center(child: CircularProgressIndicator());
+        return const Center(
+            child: CircularProgressIndicator(
+          color: Color(0xFF344e41),
+        ));
       },
     );
   }
@@ -230,7 +290,27 @@ class _LandingPageState extends State<LandingPage> {
       builder: (context, state) {
         if (state is LandingLoaded) {
           if (state.shops.isEmpty) {
-            return const Center(child: Text("No shops available"));
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 28,
+                  ),
+                  Icon(
+                    Icons.shop_two_outlined,
+                    size: 48,
+                    color: Colors.grey.shade800,
+                  ),
+                  Text(
+                    'No shops available',
+                    style: TextStyle(color: Colors.grey.shade800),
+                  ),
+                ],
+              ),
+            );
           }
           return ListView.builder(
             shrinkWrap: true,
@@ -251,7 +331,7 @@ class _LandingPageState extends State<LandingPage> {
                     child: Icon(
                       Icons.store,
                       size: 32,
-                      color: AppColors.primaryColor,
+                      color: Color(0xFF344e41),
                     ),
                   ),
                   title: Text(shop['data']['shop_name']),
@@ -263,7 +343,10 @@ class _LandingPageState extends State<LandingPage> {
             },
           );
         }
-        return const Center(child: CircularProgressIndicator());
+        return const Center(
+            child: CircularProgressIndicator(
+          color: Color(0xFF344e41),
+        ));
       },
     );
   }

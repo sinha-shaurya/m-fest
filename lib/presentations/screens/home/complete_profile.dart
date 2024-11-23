@@ -76,8 +76,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Complete Your Profile'),
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Color(0xFFa7c957),
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -102,8 +101,19 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 (Route<dynamic> route) => false);
           }
         },
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(16.0),
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFa7c957),
+                Color(0xFF386641),
+              ],
+            ),
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +146,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     return Container(
       padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white54,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(width: 0.25),
       ),
@@ -145,8 +155,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
           TextField(
             controller: _firstNameController,
             decoration: InputDecoration(
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               labelText: "First Name",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -158,8 +170,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
           TextField(
             controller: _lastNameController,
             decoration: InputDecoration(
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               labelText: "Last Name",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -172,8 +186,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             controller: _phoneNumberController,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               labelText: "Phone Number",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -189,7 +205,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               Radio<String>(
                 value: "Male",
                 groupValue: _selectedGender,
-                activeColor: AppColors.primaryColor,
+                activeColor: Color(0xFF386641),
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value;
@@ -200,7 +216,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               Radio<String>(
                 value: "Female",
                 groupValue: _selectedGender,
-                activeColor: AppColors.primaryColor,
+                activeColor: Color(0xFF386641),
                 onChanged: (value) {
                   setState(() {
                     _selectedGender = value;
@@ -246,7 +262,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: Color(0xFF386641),
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -266,7 +282,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     return Container(
       padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white54,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(width: 0.25),
       ),
@@ -275,8 +291,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
           TextField(
             controller: _cityController,
             decoration: InputDecoration(
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               labelText: "City",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -304,9 +322,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 });
               },
               decoration: InputDecoration(
+                fillColor: Colors.white60,
+                filled: true,
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor),
-                ),
+                    borderSide: BorderSide(color: Color(0xFF386641))),
                 labelText: "State",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -320,8 +339,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             controller: _zipCodeController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor)),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               labelText: "Pincode",
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -374,7 +395,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               }));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: Color(0xFF386641),
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -401,7 +422,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
     return Container(
       padding: const EdgeInsets.all(36),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white54,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(width: 0.25),
       ),
@@ -412,9 +433,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             decoration: InputDecoration(
               labelText: "Shop Name",
               prefixIcon: const Icon(Icons.store),
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
-              ),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -426,9 +448,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             decoration: InputDecoration(
               labelText: "City",
               prefixIcon: const Icon(Icons.location_on),
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
-              ),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -452,9 +475,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 });
               },
               decoration: InputDecoration(
+                fillColor: Colors.white60,
+                filled: true,
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor),
-                ),
+                    borderSide: BorderSide(color: Color(0xFF386641))),
                 labelText: "State",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -470,9 +494,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             decoration: InputDecoration(
               labelText: "Pincode",
               prefixIcon: const Icon(Icons.numbers),
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
-              ),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -497,9 +522,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
             decoration: InputDecoration(
               labelText: "Category",
               prefixIcon: const Icon(Icons.category),
+              fillColor: Colors.white60,
+              filled: true,
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColors.primaryColor),
-              ),
+                  borderSide: BorderSide(color: Color(0xFF386641))),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -511,9 +537,10 @@ class _CompleteProfileState extends State<CompleteProfile> {
               controller: _categoryController,
               decoration: InputDecoration(
                 labelText: "Enter Category",
+                fillColor: Colors.white60,
+                filled: true,
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.primaryColor),
-                ),
+                    borderSide: BorderSide(color: Color(0xFF386641))),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -569,7 +596,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
               }));
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: Color(0xFF386641),
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

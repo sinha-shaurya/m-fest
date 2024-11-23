@@ -1,4 +1,3 @@
-import 'package:aash_india/core/constants/theme.dart';
 import 'package:flutter/material.dart';
 
 class LoginDialog extends StatelessWidget {
@@ -22,7 +21,7 @@ class LoginDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: onLogin,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: Color(0xFF344e41),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
