@@ -55,121 +55,114 @@ class _ProfilePageState extends State<ProfilePage> {
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileFetched) {
-            return Padding(
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFa7c957),
+                    Color(0xFF386641),
+                  ],
+                ),
+              ),
               padding: const EdgeInsets.all(16.0),
-              child: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildProfileImage(state.gender == 'Male'),
-                      const SizedBox(height: 20),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Clipboard.setData(ClipboardData(text: state.id));
-                      //     ScaffoldMessenger.of(context).showSnackBar(
-                      //       const SnackBar(
-                      //           content: Text("Copied to clipboard")),
-                      //     );
-                      //   },
-                      //   child: Container(
-                      //       padding: const EdgeInsets.all(8),
-                      //       decoration: _boxDecoration(),
-                      //       child: Text("id: ${state.id}")),
-                      // ),
-                      state.type == 'partner'
-                          ? ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _showQRCode = !_showQRCode;
-                                });
-                              },
-                              child: Text(_showQRCode
-                                  ? 'Hide QR Code'
-                                  : 'Show QR Code'),
-                            )
-                          : SizedBox(),
-                      const SizedBox(height: 20),
-                      if (_showQRCode)
-                        Container(
-                          decoration: _boxDecoration(),
-                          child: QrImageView(
-                            data: state.id,
-                            version: QrVersions.auto,
-                            size: 200.0,
-                          ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildProfileImage(state.gender == 'Male'),
+                    state.type == 'partner'
+                        ? ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _showQRCode = !_showQRCode;
+                              });
+                            },
+                            child: Text(
+                                _showQRCode ? 'Hide QR Code' : 'Show QR Code'),
+                          )
+                        : SizedBox(),
+                    const SizedBox(height: 20),
+                    if (_showQRCode)
+                      Container(
+                        decoration: _boxDecoration(),
+                        child: QrImageView(
+                          data: state.id,
+                          version: QrVersions.auto,
+                          size: 200.0,
                         ),
-                      const SizedBox(height: 20),
-                      _buildInfoSection(
-                        title: 'Personal Information',
-                        content: [
-                          InfoTile(
-                            label: 'First Name',
-                            value: state.fname,
-                            icon: Icons.person,
-                          ),
-                          InfoTile(
-                            label: 'Last Name',
-                            value: state.lname,
-                            icon: Icons.person,
-                          ),
-                          InfoTile(
-                            label: 'Phone Number',
-                            value: state.phone,
-                            icon: Icons.phone,
-                          ),
-                        ],
-                        onEditPressed: () {
-                          _showEditPersonalInfoDialog(context, state);
-                        },
                       ),
-                      const SizedBox(height: 20),
-                      _buildInfoSection(
-                        title: state.type == 'customer'
-                            ? 'Address Information'
-                            : 'Shop Information',
-                        content: [
-                          state.type == 'partner'
-                              ? InfoTile(
-                                  label: 'Name',
-                                  value: state.shopName ?? "",
-                                  icon: Icons.shop,
-                                )
-                              : SizedBox(),
-                          state.type == 'partner'
-                              ? InfoTile(
-                                  label: 'Category',
-                                  value: state.shopCategory ?? "",
-                                  icon: Icons.category,
-                                )
-                              : SizedBox(),
-                          InfoTile(
-                            label: 'City',
-                            value: state.city,
-                            icon: Icons.location_city,
-                          ),
-                          InfoTile(
-                            label: 'State',
-                            value: state.state,
-                            icon: Icons.map_outlined,
-                          ),
-                          InfoTile(
-                            label: 'Pincode',
-                            value: state.pincode,
-                            icon: Icons.numbers,
-                          ),
-                        ],
-                        onEditPressed: () {
-                          state.type == 'customer'
-                              ? _showEditAddressDialog(context, state)
-                              : _showEditShopInfoDialog(context, state);
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildSettingsSection(state.type == 'partner'),
-                    ],
-                  ),
+                    const SizedBox(height: 20),
+                    _buildInfoSection(
+                      title: 'Personal Information',
+                      content: [
+                        InfoTile(
+                          label: 'First Name',
+                          value: state.fname,
+                          icon: Icons.person,
+                        ),
+                        InfoTile(
+                          label: 'Last Name',
+                          value: state.lname,
+                          icon: Icons.person,
+                        ),
+                        InfoTile(
+                          label: 'Phone Number',
+                          value: state.phone,
+                          icon: Icons.phone,
+                        ),
+                      ],
+                      onEditPressed: () {
+                        _showEditPersonalInfoDialog(context, state);
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildInfoSection(
+                      title: state.type == 'customer'
+                          ? 'Address Information'
+                          : 'Shop Information',
+                      content: [
+                        state.type == 'partner'
+                            ? InfoTile(
+                                label: 'Name',
+                                value: state.shopName ?? "",
+                                icon: Icons.shop,
+                              )
+                            : SizedBox(),
+                        state.type == 'partner'
+                            ? InfoTile(
+                                label: 'Category',
+                                value: state.shopCategory ?? "",
+                                icon: Icons.category,
+                              )
+                            : SizedBox(),
+                        InfoTile(
+                          label: 'City',
+                          value: state.city,
+                          icon: Icons.location_city,
+                        ),
+                        InfoTile(
+                          label: 'State',
+                          value: state.state,
+                          icon: Icons.map_outlined,
+                        ),
+                        InfoTile(
+                          label: 'Pincode',
+                          value: state.pincode,
+                          icon: Icons.numbers,
+                        ),
+                      ],
+                      onEditPressed: () {
+                        state.type == 'customer'
+                            ? _showEditAddressDialog(context, state)
+                            : _showEditShopInfoDialog(context, state);
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildSettingsSection(state.type == 'partner'),
+                  ],
                 ),
               ),
             );
@@ -185,15 +178,20 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileImage(bool male) {
-    return Center(
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white54,
+        borderRadius: BorderRadius.circular(100),
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
         child: Image.asset(
           male ? 'assets/man.jpeg' : 'assets/woman.jpeg',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
-          height: 200,
-          width: 200,
+          height: 165,
+          width: 165,
         ),
       ),
     );
@@ -230,11 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          // const ListTile(
-          //   leading: Icon(Icons.replay),
-          //   title: Text('Change Password'),
-          // ),
-          // const Divider(),
           ListTile(
             leading: const Icon(Icons.mobile_friendly),
             title: const Text('Version'),
@@ -294,7 +287,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: Colors.white54,
       borderRadius: BorderRadius.circular(8),
       border: Border.all(width: 0.25),
     );
@@ -376,7 +369,7 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: const Text(
                 'Save',
-                style: TextStyle(color: AppColors.primaryColor),
+                style: TextStyle(color: Color(0xFF386641)),
               ),
             ),
           ],
@@ -437,7 +430,7 @@ class _ProfilePageState extends State<ProfilePage> {
               builder: (context, state) {
                 if (state is CouponLoading) {
                   return CircularProgressIndicator(
-                    color: AppColors.primaryColor,
+                    color: Color(0xFF386641),
                   );
                 }
                 return ElevatedButton(
@@ -542,7 +535,7 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: const Text(
                 'Save',
-                style: TextStyle(color: AppColors.primaryColor),
+                style: TextStyle(color: Color(0xFF386641)),
               ),
             ),
           ],
@@ -580,8 +573,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: const InputDecoration(labelText: 'Shop Name'),
                 ),
                 const SizedBox(height: 12),
-
-                // Shop Category field with dropdown
                 DropdownButtonFormField<String>(
                   value: isOtherCategory ? 'Others' : updatedCategory,
                   decoration: const InputDecoration(labelText: 'Category'),
@@ -607,8 +598,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 ),
                 const SizedBox(height: 12),
-
-                // Show custom category text field if 'Others' is selected
                 isOtherCategory
                     ? TextFormField(
                         controller: categoryController,
@@ -619,7 +608,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             const InputDecoration(labelText: 'Enter Category'),
                       )
                     : const SizedBox(),
-
                 const SizedBox(height: 12),
                 TextFormField(
                   initialValue: state.city,
@@ -686,7 +674,7 @@ class _ProfilePageState extends State<ProfilePage> {
               },
               child: const Text(
                 'Save',
-                style: TextStyle(color: AppColors.primaryColor),
+                style: TextStyle(color: Color(0xFF386641)),
               ),
             ),
           ],

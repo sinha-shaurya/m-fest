@@ -1,4 +1,3 @@
-import 'package:aash_india/core/constants/theme.dart';
 import 'package:flutter/material.dart';
 
 class CategoryItem extends StatelessWidget {
@@ -8,7 +7,7 @@ class CategoryItem extends StatelessWidget {
   final VoidCallback? onTap;
   const CategoryItem(
       {super.key,
-        this.onTap,
+      this.onTap,
       this.isActive = false,
       required this.name,
       required this.icon});
@@ -19,24 +18,31 @@ class CategoryItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        padding: const EdgeInsets.all(10),
         width: 125,
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primaryColor : Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isActive
+                ? [
+                    Color(0xFFa7c957),
+                    Color(0xFF386641),
+                  ]
+                : [Colors.white, Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(100),
           border:
               Border.all(color: isActive ? Colors.white : Colors.grey.shade400),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                color: isActive ? Colors.white : appTheme(context).primaryColor),
-            const SizedBox(width: 5),
-            Text(name,
-                style: TextStyle(
-                    color:
-                        isActive ? Colors.white : appTheme(context).primaryColor,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              name,
+              style: TextStyle(
+                color: isActive ? Colors.white : Colors.grey.shade700,
+              ),
+            ),
           ],
         ),
       ),

@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
 import 'package:aash_india/bloc/appdata/app_data_event.dart';
+import 'package:aash_india/bloc/auth/auth_bloc.dart';
+import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
 import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
@@ -12,6 +14,7 @@ import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_event.dart';
 import 'package:aash_india/bloc/profile/profile_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
+import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/coupon/coupon_detail.dart';
 import 'package:aash_india/presentations/screens/coupon/coupons.dart';
 import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
@@ -60,13 +63,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadCities() async {
     try {
       cities = await CouponBloc().fetchCities();
-      if (cities.isNotEmpty) {
-        cities = ["All"] + cities;
-      }
       final SharedPreferences pref = await SharedPreferences.getInstance();
       String? city = pref.getString('selectedCity');
       setState(() {
-        selectedCity = city ?? (cities.isNotEmpty ? cities[0] : null);
+        selectedCity = city ?? cities[0];
       });
     } catch (error) {
       log(error.toString());
@@ -81,93 +81,120 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileFetched) {
-          setState(() {
-            isPartner = state.type != 'customer';
-          });
-        }
-      },
-      child: BlocListener<CouponBloc, CouponState>(
-        listener: (context, state) {
-          if (state is CouponFailed) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(state.error),
-              backgroundColor: AppColors.errorColor,
-            ));
-          } else if (state is CouponSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(state.message ?? "success"),
-              backgroundColor: Colors.green,
-            ));
-          }
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Image.asset(
-              'assets/logo.png',
-              height: 80,
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ProfileBloc, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileFetched) {
+              setState(() {
+                isPartner = state.type != 'customer';
+              });
+            }
+          },
+        ),
+        BlocListener<CouponBloc, CouponState>(
+          listener: (context, state) {
+            if (state is CouponFailed) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(state.error),
+                backgroundColor: AppColors.errorColor,
+              ));
+            } else if (state is CouponSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(state.message ?? "success"),
+                backgroundColor: Colors.green,
+              ));
+            }
+          },
+        ),
+        BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthLogout) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (Route<dynamic> route) => false,
+              );
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Image.asset(
+            'assets/logo.png',
+            height: 80,
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xFFa7c957),
+          foregroundColor: Color(0xFF344e41),
+          elevation: 0,
+          leading: Builder(
+            builder: (context) => IconButton(
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              icon: Icon(Icons.menu),
             ),
-            centerTitle: true,
-            backgroundColor: AppColors.primaryColor,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            leading: Builder(
-              builder: (context) => IconButton(
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                icon: Icon(Icons.menu),
-              ),
-            ),
-            actions: [
-              Text(selectedCity ?? 'All'),
-              cities.isNotEmpty
-                  ? PopupMenuButton<String>(
-                      icon: Icon(Icons.pin_drop, color: Colors.white),
-                      onSelected: (String newValue) {
-                        setState(() {
-                          selectedCity = newValue;
-                        });
-                        BlocProvider.of<CouponBloc>(context)
-                            .add(GetAllCoupons(city: newValue));
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return cities
-                            .map((String city) => city)
-                            .toList()
-                            .map<PopupMenuItem<String>>((String city) {
-                          return PopupMenuItem<String>(
-                            value: city,
-                            child: Text(
-                              city,
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          );
-                        }).toList();
-                      },
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('N/A'),
-                        Icon(Icons.pin_drop),
+          ),
+          actions: [
+            Text(selectedCity ?? ""),
+            cities.isNotEmpty
+                ? PopupMenuButton<String>(
+                    icon: Icon(Icons.pin_drop, color: Colors.white),
+                    onSelected: (String newValue) {
+                      setState(() {
+                        selectedCity = newValue;
+                      });
+                      BlocProvider.of<CouponBloc>(context)
+                          .add(GetAllCoupons(city: newValue));
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return cities
+                          .map((String city) => city)
+                          .toList()
+                          .map<PopupMenuItem<String>>((String city) {
+                        return PopupMenuItem<String>(
+                          value: city,
+                          child: Text(
+                            city,
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        );
+                      }).toList();
+                    },
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('N/A'),
+                      Icon(Icons.pin_drop),
+                    ],
+                  ),
+          ],
+        ),
+        drawer: AppDrawer(),
+        body: BlocBuilder<NavigationBloc, NavigationState>(
+          builder: (context, state) {
+            if (state is NavigationHome) {
+              BlocProvider.of<CouponBloc>(context)
+                  .add(FilterCoupons(activeCategory));
+
+              return RefreshIndicator.adaptive(
+                onRefresh: _initializeState,
+                color: AppColors.accentColor,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFa7c957),
+                        Color(0xFF386641),
                       ],
                     ),
-            ],
-          ),
-          drawer: AppDrawer(),
-          body: BlocBuilder<NavigationBloc, NavigationState>(
-            builder: (context, state) {
-              if (state is NavigationHome) {
-                BlocProvider.of<CouponBloc>(context)
-                    .add(FilterCoupons(activeCategory));
-
-                return RefreshIndicator.adaptive(
-                  onRefresh: _initializeState,
-                  color: AppColors.accentColor,
+                  ),
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Column(
@@ -180,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           margin: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white70,
                               borderRadius: BorderRadius.circular(4)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -193,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Column(
                                   children: [
                                     Icon(Icons.shopping_bag,
-                                        color: AppColors.primaryColor),
+                                        color: Color(0xFF344e41)),
                                     const SizedBox(height: 4),
                                     Text('Coupons'),
                                   ],
@@ -206,8 +233,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 child: Column(
                                   children: [
-                                    Icon(Icons.pages,
-                                        color: AppColors.primaryColor),
+                                    Icon(Icons.pages, color: Color(0xFF344e41)),
                                     const SizedBox(height: 4),
                                     Text('Banners'),
                                   ],
@@ -221,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Column(
                                   children: [
                                     Icon(Icons.person,
-                                        color: AppColors.primaryColor),
+                                        color: Color(0xFF344e41)),
                                     const SizedBox(height: 4),
                                     Text('Profile'),
                                   ],
@@ -231,185 +257,228 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        BlocBuilder<ProfileBloc, ProfileState>(
-                          builder: (context, state) {
-                            if (state is ProfileFetched) {
-                              return Text(
-                                state.type == 'customer'
-                                    ? '\t\tPopular coupons'
-                                    : '\t\tYour coupons',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.grey.shade800),
-                              );
-                            }
-                            return Text(
-                              '\t\tPopular coupons',
-                              style: TextStyle(
-                                  fontSize: 20, color: Colors.grey.shade800),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildCategories(),
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: BlocBuilder<CouponBloc, CouponState>(
-                            builder: (context, state) {
-                              if (state is CouponLoaded) {
-                                if (state.coupons.isEmpty) {
-                                  return Text("No coupons available");
-                                }
-                                return GridView.builder(
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 6,
-                                    mainAxisSpacing: 6,
-                                  ),
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: state.coupons.length,
-                                  itemBuilder: (context, index) {
-                                    final coupon = state.coupons[index];
-                                    return GestureDetector(
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => CouponDetail(
-                                            id: state.coupons[index]['_id'],
-                                          ),
-                                        ),
-                                      ),
-                                      child: Card(
-                                        color: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "${coupon['discountPercentage']}%",
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors.primaryColor,
+                        Container(
+                          color: Colors.grey.shade100,
+                          padding: const EdgeInsets.fromLTRB(4, 24, 4, 0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              BlocBuilder<ProfileBloc, ProfileState>(
+                                builder: (context, state) {
+                                  if (state is ProfileFetched) {
+                                    return Text(
+                                      state.type == 'customer'
+                                          ? '\t\tPopular coupons'
+                                          : '\t\tYour coupons',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.grey.shade800),
+                                    );
+                                  }
+                                  return Text(
+                                    '\t\tPopular coupons',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.grey.shade800),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              _buildCategories(),
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: BlocBuilder<CouponBloc, CouponState>(
+                                  builder: (context, state) {
+                                    if (state is CouponLoaded) {
+                                      if (state.coupons.isEmpty) {
+                                        return SizedBox(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              const SizedBox(
+                                                height: 28,
                                               ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              coupon['title'].toString(),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(Icons.store,
+                                              Icon(
+                                                Icons.folder_outlined,
+                                                size: 48,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                              Text(
+                                                'No Coupons Available',
+                                                style: TextStyle(
                                                     color:
                                                         Colors.grey.shade700),
-                                                const SizedBox(width: 4),
-                                                Text('shop'),
-                                              ],
-                                            ),
-                                          ],
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return GridView.builder(
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3,
+                                          crossAxisSpacing: 6,
+                                          mainAxisSpacing: 6,
                                         ),
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: state.coupons.length,
+                                        itemBuilder: (context, index) {
+                                          final coupon = state.coupons[index];
+                                          return GestureDetector(
+                                            onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CouponDetail(
+                                                  id: state.coupons[index]
+                                                      ['_id'],
+                                                ),
+                                              ),
+                                            ),
+                                            child: Card(
+                                              color: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "//${coupon['discountPercentage']}%",
+                                                    style: TextStyle(
+                                                      fontSize: 22,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .primaryColor,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    coupon['title'].toString(),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(Icons.store,
+                                                          color: Colors
+                                                              .grey.shade700),
+                                                      const SizedBox(width: 4),
+                                                      Text('shop'),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        backgroundColor: Color(0xFFD6573F),
                                       ),
                                     );
                                   },
-                                );
-                              }
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  backgroundColor: AppColors.primaryColor,
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                );
-              } else if (state is NavigationCategories) {
-                return PopScope(
+                ),
+              );
+            } else if (state is NavigationCategories) {
+              return PopScope(
+                canPop: false,
+                onPopInvokedWithResult: (didPop, result) {
+                  BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
+                },
+                child: SponsorPage(),
+              );
+            } else if (state is NavigationCoupon) {
+              return PopScope(
+                canPop: false,
+                onPopInvokedWithResult: (didPop, result) {
+                  BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
+                },
+                child: BlocBuilder<ProfileBloc, ProfileState>(
+                  builder: (context, state) {
+                    if (state is ProfileFetched) {
+                      if (state.type == 'customer') return Coupons();
+                      return ManageCoupons();
+                    }
+                    return const Center(
+                      child: Text('Error Fetching'),
+                    );
+                  },
+                ),
+              );
+            } else if (state is NavigationProfile) {
+              return PopScope(
                   canPop: false,
                   onPopInvokedWithResult: (didPop, result) {
                     BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
                   },
-                  child: SponsorPage(),
-                );
-              } else if (state is NavigationCoupon) {
-                return PopScope(
-                  canPop: false,
-                  onPopInvokedWithResult: (didPop, result) {
-                    BlocProvider.of<NavigationBloc>(context).add(PageTapped(0));
-                  },
-                  child: BlocBuilder<ProfileBloc, ProfileState>(
-                    builder: (context, state) {
-                      if (state is ProfileFetched) {
-                        if (state.type == 'customer') return Coupons();
-                        return ManageCoupons();
-                      }
-                      return const Center(
-                        child: Text('Error Fetching'),
-                      );
-                    },
-                  ),
-                );
-              } else if (state is NavigationProfile) {
-                return PopScope(
-                    canPop: false,
-                    onPopInvokedWithResult: (didPop, result) {
-                      BlocProvider.of<NavigationBloc>(context)
-                          .add(PageTapped(0));
-                    },
-                    child: ProfilePage());
-              }
-              return Container();
-            },
-          ),
-          // bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
-          //   builder: (context, state) {
-          //     return BottomNavigationBar(
-          //       currentIndex: _getSelectedIndex(state),
-          //       onTap: (index) {
-          //         if (index == 0 && !isPartner) {
-          //           BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
-          //         }
-          //         BlocProvider.of<NavigationBloc>(context)
-          //             .add(PageTapped(index));
-          //       },
-          //       items: [
-          //         BottomNavigationBarItem(
-          //           icon: Icon(Icons.home),
-          //           label: 'Home',
-          //         ),
-          //         BottomNavigationBarItem(
-          //           icon: Icon(Icons.pages),
-          //           label: 'Banners',
-          //         ),
-          //         BottomNavigationBarItem(
-          //           icon: Icon(Icons.topic),
-          //           label: 'Coupons',
-          //         ),
-          //         BottomNavigationBarItem(
-          //           icon: Icon(Icons.person),
-          //           label: 'Profile',
-          //         ),
-          //       ],
-          //       selectedItemColor: appTheme(context).primaryColor,
-          //       unselectedItemColor: Colors.grey,
-          //       type: BottomNavigationBarType.fixed,
-          //     );
-          //   },
-          // ),
+                  child: ProfilePage());
+            }
+            return Container();
+          },
         ),
+        // bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
+        //   builder: (context, state) {
+        //     return BottomNavigationBar(
+        //       currentIndex: _getSelectedIndex(state),
+        //       onTap: (index) {
+        //         if (index == 0 && !isPartner) {
+        //           BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
+        //         }
+        //         BlocProvider.of<NavigationBloc>(context)
+        //             .add(PageTapped(index));
+        //       },
+        //       items: [
+        //         BottomNavigationBarItem(
+        //           icon: Icon(Icons.home),
+        //           label: 'Home',
+        //         ),
+        //         BottomNavigationBarItem(
+        //           icon: Icon(Icons.pages),
+        //           label: 'Banners',
+        //         ),
+        //         BottomNavigationBarItem(
+        //           icon: Icon(Icons.topic),
+        //           label: 'Coupons',
+        //         ),
+        //         BottomNavigationBarItem(
+        //           icon: Icon(Icons.person),
+        //           label: 'Profile',
+        //         ),
+        //       ],
+        //       selectedItemColor: appTheme(context).primaryColor,
+        //       unselectedItemColor: Colors.grey,
+        //       type: BottomNavigationBarType.fixed,
+        //     );
+        //   },
+        // ),
       ),
     );
   }
@@ -420,7 +489,7 @@ class _HomePageState extends State<HomePage> {
         if (state is ProfileFetched) {
           if (state.type == 'customer') {
             return SizedBox(
-              height: 60,
+              height: 48,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -501,17 +570,17 @@ class _HomePageState extends State<HomePage> {
               decoration: InputDecoration(
                 hintText: 'Search...',
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Colors.white70,
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade400),
+                    borderSide: BorderSide(color: Color(0xFF344e41)),
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12))),
+                        topLeft: Radius.circular(100),
+                        bottomLeft: Radius.circular(100))),
                 border: OutlineInputBorder(
                     borderSide: BorderSide.none,
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12))),
+                        topLeft: Radius.circular(100),
+                        bottomLeft: Radius.circular(100))),
               ),
             ),
           ),
@@ -529,13 +598,13 @@ class _HomePageState extends State<HomePage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: Color(0xFF344e41),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(12),
-                    bottomRight: Radius.circular(12)),
+                    topRight: Radius.circular(100),
+                    bottomRight: Radius.circular(100)),
               ),
             ),
             child: Icon(Icons.search),
@@ -545,11 +614,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  int _getSelectedIndex(NavigationState state) {
-    if (state is NavigationHome) return 0;
-    if (state is NavigationCategories) return 1;
-    if (state is NavigationCoupon) return 2;
-    if (state is NavigationProfile) return 3;
-    return 0;
-  }
+  // int _getSelectedIndex(NavigationState state) {
+  //   if (state is NavigationHome) return 0;
+  //   if (state is NavigationCategories) return 1;
+  //   if (state is NavigationCoupon) return 2;
+  //   if (state is NavigationProfile) return 3;
+  //   return 0;
+  // }
 }

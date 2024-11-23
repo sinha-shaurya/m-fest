@@ -59,9 +59,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       },
       child: Scaffold(
         body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
+          child: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFa7c957),
+                    Color(0xFF386641),
+                  ],
+                ),
+              ),
               child: BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, state) {
                   return Column(
@@ -71,13 +82,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       const SizedBox(height: 20),
                       Text(
                         "Forgot Password?",
-                        style: TextStyle(fontSize: 32),
+                        style: TextStyle(fontSize: 32, color: Colors.white),
                       ),
                       const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.all(36),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.white54,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(width: 0.25),
                         ),
@@ -89,8 +100,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: "Email",
-                                border: OutlineInputBorder(
+                                filled: true,
+                                fillColor: Colors.white60,
+                                focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF386641),
+                                  ),
                                 ),
                                 prefixIcon: const Icon(Icons.email),
                               ),
@@ -151,7 +167,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor,
+                                backgroundColor: Color(0xFF386641),
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 120),
                                 shape: RoundedRectangleBorder(
@@ -182,9 +198,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.arrow_back),
+                            Icon(
+                              Icons.arrow_back,
+                              color: Colors.white60,
+                            ),
                             const SizedBox(width: 10),
-                            const Text("Go back"),
+                            const Text(
+                              "Go back",
+                              style: TextStyle(color: Colors.white70),
+                            ),
                           ],
                         ),
                       ),

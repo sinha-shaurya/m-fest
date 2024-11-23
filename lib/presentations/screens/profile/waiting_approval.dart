@@ -11,15 +11,25 @@ class WaitingApproval extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFFa7c957),
+                Color(0xFF386641),
+              ],
+            ),
+          ),
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.hourglass_empty,
+                Icons.hourglass_bottom_rounded,
                 size: 80,
-                color: Colors.amber,
+                color: Color(0xFFa7c957),
               ),
               SizedBox(height: 20),
               Text(
@@ -27,7 +37,7 @@ class WaitingApproval extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -42,6 +52,14 @@ class WaitingApproval extends StatelessWidget {
               ),
               SizedBox(height: 40),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF386641),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 onPressed: () {
                   BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
                   Navigator.pushReplacement(
@@ -49,7 +67,10 @@ class WaitingApproval extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
                 },
-                child: Text("Log out"),
+                child: Text(
+                  "Log out",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
             ],
           ),
