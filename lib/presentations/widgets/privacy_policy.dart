@@ -55,7 +55,17 @@ class PrivacyPolicy extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Close'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF386641),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            'Close',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ],
     );

@@ -120,6 +120,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
       child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
           title: Image.asset(
             'assets/logo.png',
@@ -138,10 +139,16 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           actions: [
-            Text(selectedCity ?? ""),
+            Text(
+              selectedCity ?? "",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF344e41),
+              ),
+            ),
             cities.isNotEmpty
                 ? PopupMenuButton<String>(
-                    icon: Icon(Icons.pin_drop, color: Colors.white),
+                    icon: Icon(Icons.pin_drop, color: Color(0xFF344e41)),
                     onSelected: (String newValue) {
                       setState(() {
                         selectedCity = newValue;
@@ -169,7 +176,10 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text('N/A'),
-                      Icon(Icons.pin_drop),
+                      Icon(
+                        Icons.pin_drop,
+                        color: Color(0xFF344e41),
+                      ),
                     ],
                   ),
           ],
@@ -271,16 +281,20 @@ class _HomePageState extends State<HomePage> {
                                       state.type == 'customer'
                                           ? '\t\tPopular coupons'
                                           : '\t\tYour coupons',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.grey.shade800),
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF2E7D32),
+                                      ),
                                     );
                                   }
                                   return Text(
                                     '\t\tPopular coupons',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.grey.shade800),
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2E7D32),
+                                    ),
                                   );
                                 },
                               ),
@@ -325,11 +339,12 @@ class _HomePageState extends State<HomePage> {
                                         gridDelegate:
                                             const SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 3,
-                                          crossAxisSpacing: 6,
-                                          mainAxisSpacing: 6,
+                                          crossAxisSpacing: 8,
+                                          mainAxisSpacing: 8,
                                         ),
                                         shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         itemCount: state.coupons.length,
                                         itemBuilder: (context, index) {
                                           final coupon = state.coupons[index];
@@ -339,52 +354,77 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     CouponDetail(
-                                                  id: state.coupons[index]
-                                                      ['_id'],
+                                                  id: coupon['_id'],
                                                 ),
                                               ),
                                             ),
                                             child: Card(
+                                              elevation: 2,
                                               color: Colors.white,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(8),
+                                                    BorderRadius.circular(12),
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "//${coupon['discountPercentage']}%",
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors
-                                                          .primaryColor,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${coupon['discountPercentage']}%",
+                                                      style: TextStyle(
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF2E7D32),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    coupon['title'].toString(),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(Icons.store,
-                                                          color: Colors
-                                                              .grey.shade700),
-                                                      const SizedBox(width: 4),
-                                                      Text('shop'),
-                                                    ],
-                                                  ),
-                                                ],
+                                                    const SizedBox(height: 4),
+                                                    Flexible(
+                                                      child: Text(
+                                                        coupon['title']
+                                                            .toString(),
+                                                        maxLines: 2,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Color(0xFF424242),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(Icons.store,
+                                                            color: Colors
+                                                                .grey.shade700,
+                                                            size: 20),
+                                                        const SizedBox(
+                                                            width: 4),
+                                                        Text(
+                                                          'Shop',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors
+                                                                .grey.shade600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           );
@@ -393,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                                     }
                                     return Center(
                                       child: CircularProgressIndicator(
-                                        backgroundColor: Color(0xFFD6573F),
+                                        backgroundColor: Color(0xFF344e41),
                                       ),
                                     );
                                   },

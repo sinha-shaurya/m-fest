@@ -240,37 +240,53 @@ class _LandingPageState extends State<LandingPage> {
               return GestureDetector(
                 onTap: () => _showLoginDialog(),
                 child: Card(
+                  elevation: 4,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "${coupon['discountPercentage']}%",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primaryColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${coupon['discountPercentage']}%",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2E7D32),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        coupon['title'].toString(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.store, color: Colors.grey.shade700),
-                          const SizedBox(width: 4),
-                          const Text('Shop'),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Flexible(
+                          child: Text(
+                            coupon['title'].toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF424242),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.store,
+                                color: Colors.grey.shade600, size: 20),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'Shop',
+                              style: TextStyle(
+                                  fontSize: 14, color: Color(0xFF757575)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -319,24 +335,41 @@ class _LandingPageState extends State<LandingPage> {
             itemBuilder: (context, index) {
               final shop = state.shops[index];
               return Card(
-                elevation: 1,
+                elevation: 2,
                 color: Colors.white,
-                margin: const EdgeInsets.only(bottom: 4),
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
                   leading: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                        color: Colors.pink.shade50,
-                        borderRadius: BorderRadius.circular(8)),
+                      color: Color(0xFFa7c957),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: Icon(
                       Icons.store,
-                      size: 32,
+                      size: 36,
                       color: Color(0xFF344e41),
                     ),
                   ),
-                  title: Text(shop['data']['shop_name']),
+                  title: Text(
+                    shop['data']['shop_name'],
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2E7D32),
+                    ),
+                  ),
                   subtitle: Text(
-                      '${shop['data']['shop_city']}, ${shop['data']['shop_state']}'),
+                    '${shop['data']['shop_city']}, ${shop['data']['shop_state']}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF757575),
+                    ),
+                  ),
                   onTap: _showLoginDialog,
                 ),
               );
@@ -352,9 +385,25 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2E7D32),
+            ),
+          ),
+          IconButton(
+              padding: const EdgeInsets.all(0),
+              onPressed: _showLoginDialog,
+              icon: const Icon(Icons.arrow_forward, color: Color(0xFF757575))),
+        ],
+      ),
     );
   }
 }

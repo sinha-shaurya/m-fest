@@ -8,7 +8,6 @@ import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/utils/date_formatter.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,7 +44,7 @@ class _CouponDetailState extends State<CouponDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: Color(0xFF386641),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(
@@ -61,7 +60,10 @@ class _CouponDetailState extends State<CouponDetail> {
       body: BlocBuilder<SingleCouponBloc, SingleCouponState>(
         builder: (context, state) {
           if (state is SingleCouponLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              color: Color(0xFF386641),
+            ));
           } else if (state is SingleCouponFailed) {
             return Center(child: Text(state.error));
           } else if (state is SingleCouponLoaded) {
@@ -93,123 +95,146 @@ class _CouponDetailState extends State<CouponDetail> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(
-                        child: CachedNetworkImage(
-                          imageUrl:
-                              'https://img.freepik.com/premium-vector/professional-electronic-devices-graphic-design-vector-art_1138841-23139.jpg?w=360',
-                          height: 150,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            height: 150,
-                            color: Colors.grey.shade300,
-                            child: Center(
-                              child: CircularProgressIndicator(),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFF2E7D32),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
                             ),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            height: 150,
-                            color: Colors.grey.shade300,
-                            child: Icon(
-                              Icons.broken_image,
-                              color: Colors.grey,
-                              size: 50,
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white54,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: Icon(
+                                Icons.store,
+                                color: Color(0xFF386641),
+                                size: 40,
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    shopName,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    shopCategory,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    '$shopCity, $shopState, $shopPincode',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       Text(
                         title,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF2E7D32),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         'Category: $category',
                         style: const TextStyle(
-                            fontSize: 18, color: Colors.black54),
+                          fontSize: 18,
+                          color: Colors.black54,
+                        ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       Text(
                         '$discountPercentage% OFF',
                         style: TextStyle(
-                          fontSize: 22,
-                          // color: hexToColor(colorHex),
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFFd32f2f),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           const Icon(Icons.calendar_today,
-                              size: 16, color: Colors.black54),
-                          const SizedBox(width: 5),
+                              size: 20, color: Color(0xFF2E7D32)),
+                          const SizedBox(width: 8),
                           Text(
                             'Valid till: ${formatValidityDate(validTill)}',
                             style: const TextStyle(
-                                fontSize: 16, color: Colors.black54),
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const Divider(),
-                      const Text(
-                        'Shop Details',
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        shopName,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        shopCategory,
-                        style: const TextStyle(
-                            fontSize: 16, color: Colors.black54),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '$shopCity, $shopState, $shopPincode',
-                        style: const TextStyle(
-                            fontSize: 16, color: Colors.black54),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       const Text(
                         'Contact Details',
                         style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2E7D32),
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           const Icon(Icons.person,
-                              size: 16, color: Colors.black54),
-                          const SizedBox(width: 5),
+                              size: 20, color: Color(0xFF386641)),
+                          const SizedBox(width: 10),
                           Text(
                             '$ownerFirstName $ownerLastName',
-                            style: const TextStyle(fontSize: 16),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black87),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           const Icon(Icons.phone,
-                              size: 16, color: Colors.black54),
-                          const SizedBox(width: 5),
-                          Text(phoneNumber,
-                              style: const TextStyle(fontSize: 16)),
+                              size: 20, color: Color(0xFF386641)),
+                          const SizedBox(width: 10),
+                          Text(
+                            phoneNumber,
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black87),
+                          ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      const SizedBox(height: 12),
                       BlocBuilder<ProfileBloc, ProfileState>(
                         builder: (context, state) {
                           if (state is ProfileFetched) {
@@ -231,7 +256,7 @@ class _CouponDetailState extends State<CouponDetail> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: couponData['redeemed']
                                         ? Colors.grey.shade400
-                                        : AppColors.primaryColor,
+                                        : Color(0xFF386641),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 40.0, vertical: 15.0),
                                     shape: RoundedRectangleBorder(
@@ -244,8 +269,8 @@ class _CouponDetailState extends State<CouponDetail> {
                                         )
                                       : Text(
                                           couponData['redeemed']
-                                              ? 'Already availed'
-                                              : 'Redeem',
+                                              ? 'Coupon Availed'
+                                              : 'Avail Coupon',
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: couponData['redeemed']
@@ -288,7 +313,10 @@ class _CouponDetailState extends State<CouponDetail> {
                                         ),
                                       ),
                                       SizedBox(width: 12),
-                                      Icon(Icons.send),
+                                      Icon(
+                                        Icons.send,
+                                        color: Color(0xFF386641),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -325,6 +353,7 @@ class _CouponDetailState extends State<CouponDetail> {
             children: [
               TextField(
                 controller: mobileNumberController,
+                keyboardType: TextInputType.phone,
                 decoration: InputDecoration(labelText: "Mobile Number"),
               ),
               SizedBox(height: 20),
@@ -367,6 +396,15 @@ class _CouponDetailState extends State<CouponDetail> {
                   );
                 }
                 return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF386641),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   onPressed: () {
                     final phoneRegex = RegExp(r'^[6-9][0-9]{9}$');
                     if (!phoneRegex

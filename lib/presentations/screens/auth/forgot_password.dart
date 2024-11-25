@@ -108,6 +108,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     color: Color(0xFF386641),
                                   ),
                                 ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                    color: Color(0xFF386641),
+                                  ),
+                                ),
                                 prefixIcon: const Icon(Icons.email),
                               ),
                             ),
@@ -117,8 +123,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 controller: _otpController,
                                 decoration: InputDecoration(
                                   labelText: "OTP",
+                                  filled: true,
+                                  fillColor: Colors.white60,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF386641),
+                                    ),
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF386641),
+                                    ),
                                   ),
                                   prefixIcon: const Icon(Icons.lock),
                                 ),
@@ -128,8 +145,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 controller: _passwordController,
                                 decoration: InputDecoration(
                                   labelText: "New Password",
+                                  filled: true,
+                                  fillColor: Colors.white60,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF386641),
+                                    ),
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF386641),
+                                    ),
                                   ),
                                   prefixIcon: const Icon(Icons.lock),
                                 ),
