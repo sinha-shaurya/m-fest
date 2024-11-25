@@ -29,7 +29,7 @@ class CouponCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color cardColor =
-        active ? (color ?? Color(0xFF880E4F)) : Colors.grey.shade700;
+        active ? (color ?? Color(0xFF344e41)) : Colors.grey.shade700;
 
     return Container(
       margin: const EdgeInsets.all(16.0),

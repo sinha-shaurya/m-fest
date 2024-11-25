@@ -38,7 +38,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['cities'] != null) {
-          return List<String>.from(['All'] + data['cities']);
+          return List<String>.from(data['cities']);
         } else {
           return [];
         }
@@ -96,7 +96,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       final selectedCity = prefs.getString('selectedCity');
       if (event.city != null) {
         if (selectedCity == null || selectedCity != event.city) {
-          await prefs.setString('selectedState', event.city ?? "Ranchi");
+          await prefs.setString('selectedState', event.city!);
         }
       }
       final token = prefs.getString('token');
@@ -347,7 +347,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
       if (token == null) {
         emit(CouponFailed('Unable to fetch coupons'));
         return;
@@ -359,11 +358,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           'Authorization': 'Bearer $token'
         },
       );
-
+      dynamic res = await jsonDecode(response.body);
       if (response.statusCode == 200) {
         emit(CouponSuccess('Coupon availed successfully.'));
       } else {
-        emit(CouponFailed('Something went wrong'));
+        emit(CouponFailed(res['message']));
       }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
