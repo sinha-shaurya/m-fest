@@ -75,6 +75,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildProfileImage(state.gender == 'Male'),
                     state.type == 'partner'
                         ? ElevatedButton(
+                            style: ButtonStyle(
+                              foregroundColor:
+                                  WidgetStatePropertyAll(Colors.white),
+                              backgroundColor: WidgetStatePropertyAll(
+                                Color(0xFF386641),
+                              ),
+                            ),
                             onPressed: () {
                               setState(() {
                                 _showQRCode = !_showQRCode;

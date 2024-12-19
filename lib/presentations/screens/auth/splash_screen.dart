@@ -70,22 +70,24 @@ class SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthSuccess) {
-          _navigateToHome(context);
-          return;
-        } else if (state is AuthNotApproved) {
-          _navigateToWaitingApproval(context);
-          return;
-        } else if (state is AuthIncomplete) {
-          _navigateToCompleteProfile(context, state);
-          return;
-        } else if (state is AuthFailed) {
-          _handleError(context, state);
-          return;
-        } else {
-          _navigateToLanding(context);
-          return;
-        }
+        _navigateToHome(context);
+        return;
+        // if (state is AuthSuccess) {
+        //   _navigateToHome(context);
+        //   return;
+        // } else if (state is AuthNotApproved) {
+        //   _navigateToWaitingApproval(context);
+        //   return;
+        // } else if (state is AuthIncomplete) {
+        //   _navigateToCompleteProfile(context, state);
+        //   return;
+        // } else if (state is AuthFailed) {
+        //   _handleError(context, state);
+        //   return;
+        // } else {
+        //   _navigateToLanding(context);
+        //   return;
+        // }
       },
       child: const Scaffold(
         body: Center(

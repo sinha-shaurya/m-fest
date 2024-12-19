@@ -65,7 +65,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           emit(ProfileFailed('Failed to fetch profile data'));
         }
       } else {
-        emit(ProfileFailed('Not authenticated'));
+        emit(ProfileFailed(''));
       }
     } catch (error) {
       emit(ProfileFailed('Unknown error occurred.'));
