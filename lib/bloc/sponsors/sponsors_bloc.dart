@@ -29,7 +29,14 @@ class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
         if (responseData.isEmpty) {
           emit(SponsorLoaded([]));
         } else {
-          emit(SponsorLoaded(sponsors.reversed.toList()));
+          if (event.isCarousel) {
+            var filteredSponsors = sponsors
+                .where((sponsor) => sponsor['display'] == true)
+                .toList();
+            emit(SponsorLoaded(filteredSponsors.reversed.toList()));
+          } else {
+            emit(SponsorLoaded(sponsors.reversed.toList()));
+          }
         }
       } else {
         emit(SponsorFailed('Something went wrong'));

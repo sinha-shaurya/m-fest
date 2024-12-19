@@ -40,7 +40,7 @@ class BannerCarouselState extends State<BannerCarousel> {
   }
 
   void _loadSponsors() {
-    BlocProvider.of<SponsorBloc>(context).add(GetAllSponsors());
+    BlocProvider.of<SponsorBloc>(context).add(GetAllSponsors(isCarousel: true));
   }
 
   @override
@@ -57,10 +57,10 @@ class BannerCarouselState extends State<BannerCarousel> {
         if (state is SponsorLoaded) {
           sponsors = state.sponsors;
           if (sponsors.isEmpty) {
-            return Center(child: Text("No sponsors available"));
+            return const SizedBox();
           }
           return SizedBox(
-            height: 200,
+            height: 220,
             child: PageView.builder(
               controller: _pageController,
               itemCount: sponsors.length,
@@ -93,7 +93,7 @@ class BannerCarouselState extends State<BannerCarousel> {
         children: [
           Image.network(
             logoPath,
-            fit: BoxFit.fitHeight,
+            fit: BoxFit.contain,
             height: 160,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) {
@@ -118,6 +118,13 @@ class BannerCarouselState extends State<BannerCarousel> {
                 ),
               );
             },
+          ),
+          SizedBox(
+            height: 6,
+          ),
+          Text(
+            title,
+            style: TextStyle(fontSize: 16),
           ),
         ],
       ),

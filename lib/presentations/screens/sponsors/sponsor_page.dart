@@ -21,50 +21,52 @@ class _SponsorPageState extends State<SponsorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Featured Sponsors',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Featured Sponsors',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: BlocBuilder<SponsorBloc, SponsorState>(
-                  builder: (context, state) {
-                    if (state is SponsorLoaded) {
-                      if (state.sponsors.isEmpty) {
-                        return Text("No sponsors available");
-                      }
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: state.sponsors.length,
-                        itemBuilder: (context, index) {
-                          return _buildSponsorBanner(
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: BlocBuilder<SponsorBloc, SponsorState>(
+                    builder: (context, state) {
+                      if (state is SponsorLoaded) {
+                        if (state.sponsors.isEmpty) {
+                          return Text("No sponsors available");
+                        }
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: state.sponsors.length,
+                          itemBuilder: (context, index) {
+                            return _buildSponsorBanner(
                               title: state.sponsors[index]['title'],
                               logoPath: state.sponsors[index]['img'],
-                              url: state.sponsors[index]['link']);
-                        },
+                            );
+                          },
+                        );
+                      }
+                      return Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: AppColors.primaryColor,
+                        ),
                       );
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                    );
-                  },
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -75,7 +77,6 @@ class _SponsorPageState extends State<SponsorPage> {
     required String title,
     String? description,
     required String logoPath,
-    required String url,
   }) {
     return GestureDetector(
       onTap: () {

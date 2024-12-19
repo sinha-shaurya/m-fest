@@ -1,4 +1,5 @@
 import 'package:aash_india/presentations/screens/auth/login.dart';
+import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:aash_india/bloc/coupons/coupon_bloc.dart';
@@ -34,6 +35,13 @@ class _LandingPageState extends State<LandingPage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
+  void _navigateToBanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SponsorPage()),
     );
   }
 
@@ -123,7 +131,7 @@ class _LandingPageState extends State<LandingPage> {
                                 color: Colors.grey.shade800,
                               ),
                               Text(
-                                'No resturants available',
+                                'No restaurants available',
                                 style: TextStyle(color: Colors.grey.shade800),
                               ),
                             ],
@@ -168,34 +176,34 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Widget _buildCategoryIcons() {
-    return GestureDetector(
-      onTap: _showLoginDialog,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white54,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildIconWithLabel(Icons.topic_outlined, 'Coupons'),
-            _buildIconWithLabel(Icons.image_outlined, 'Banners'),
-            _buildIconWithLabel(Icons.login, 'Auth'),
-          ],
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white54,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildIconWithLabel(Icons.topic_outlined,()=>_navigateToLogin(), 'Coupons',),
+          _buildIconWithLabel(Icons.image_outlined,()=>_navigateToBanner(), 'Banners'),
+          _buildIconWithLabel(Icons.login,()=>_navigateToLogin(), 'Auth'),
+        ],
       ),
     );
   }
 
-  Widget _buildIconWithLabel(IconData icon, String label) {
-    return Column(
-      children: [
-        Icon(icon, color: Color(0xFF344e41)),
-        const SizedBox(height: 4),
-        Text(label),
-      ],
+  Widget _buildIconWithLabel(IconData icon,void Function()? onTap, String label) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Icon(icon, color: Color(0xFF344e41)),
+          const SizedBox(height: 4),
+          Text(label),
+        ],
+      ),
     );
   }
 

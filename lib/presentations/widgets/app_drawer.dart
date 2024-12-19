@@ -5,6 +5,7 @@ import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/navigation/navigation_event.dart';
+import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
@@ -117,26 +118,50 @@ class AppDrawer extends StatelessWidget {
                     style: TextStyle(color: Color(0xFF386641)),
                   ),
                   onTap: () {
-                    BlocProvider.of<NavigationBloc>(context).add(PageTapped(2));
+                    if (BlocProvider.of<AuthBloc>(context).state
+                        is AuthSuccess) {
+                      BlocProvider.of<NavigationBloc>(context)
+                          .add(PageTapped(2));
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                      );
+                    }
                     Navigator.pop(context);
                   },
                 ),
                 Divider(),
-                ListTile(
-                  leading: Icon(
-                    Icons.person,
-                    color: Color(0xFF386641),
-                  ),
-                  title: Text(
-                    'Profile',
-                    style: TextStyle(color: Color(0xFF386641)),
-                  ),
-                  onTap: () {
-                    BlocProvider.of<NavigationBloc>(context).add(PageTapped(3));
-                    Navigator.pop(context);
-                  },
-                ),
-                Divider(),
+                BlocProvider.of<AuthBloc>(context).state is AuthSuccess
+                    ? ListTile(
+                        leading: Icon(
+                          Icons.person,
+                          color: Color(0xFF386641),
+                        ),
+                        title: Text(
+                          'Profile',
+                          style: TextStyle(color: Color(0xFF386641)),
+                        ),
+                        onTap: () {
+                          if (BlocProvider.of<AuthBloc>(context).state
+                              is AuthSuccess) {
+                            BlocProvider.of<NavigationBloc>(context)
+                                .add(PageTapped(3));
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
+                          }
+                          Navigator.pop(context);
+                        },
+                      )
+                    : const SizedBox(),
+                BlocProvider.of<AuthBloc>(context).state is AuthSuccess
+                    ? Divider()
+                    : SizedBox(),
                 ListTile(
                   leading: Icon(
                     Icons.star,
@@ -177,7 +202,9 @@ class AppDrawer extends StatelessWidget {
                     color: Color(0xFF386641),
                   ),
                   title: Text(
-                    'Logout',
+                    BlocProvider.of<AuthBloc>(context).state is AuthSuccess
+                        ? 'Logout'
+                        : 'Login',
                     style: TextStyle(color: Color(0xFF386641)),
                   ),
                   trailing: BlocBuilder<AuthBloc, AuthState>(
@@ -191,7 +218,16 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   onTap: () {
-                    BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
+                    if (BlocProvider.of<AuthBloc>(context).state
+                        is AuthSuccess) {
+                      BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                      );
+                    }
                   },
                 ),
                 Divider(),

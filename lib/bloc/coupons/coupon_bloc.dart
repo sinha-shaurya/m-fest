@@ -94,15 +94,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final selectedCity = prefs.getString('selectedCity');
+      final token = prefs.getString('token');
       if (event.city != null) {
         if (selectedCity == null || selectedCity != event.city) {
           await prefs.setString('selectedState', event.city!);
         }
-      }
-      final token = prefs.getString('token');
-      if (token == null) {
-        emit(CouponFailed('Unable to fetch coupons'));
-        return;
       }
       final uri = Uri.parse('$baseUrl/api/coupon/getall').replace(
           queryParameters: {'city': event.city, 'search': event.search});
@@ -138,7 +134,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       final token = prefs.getString('token');
 
       if (token == null) {
-        emit(CouponFailed('Unable to fetch coupons'));
         return;
       }
 
@@ -382,10 +377,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('token');
 
-        if (token == null) {
-          emit(CouponFailed('Unable to fetch coupons'));
-          return;
-        }
         final selectedCity = prefs.getString('selectedCity');
         final uri = Uri.parse('$baseUrl/api/coupon/getall')
             .replace(queryParameters: {'city': selectedCity});

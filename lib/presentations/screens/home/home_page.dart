@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:aash_india/bloc/appdata/app_data_bloc.dart';
 import 'package:aash_india/bloc/appdata/app_data_event.dart';
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
@@ -21,6 +19,7 @@ import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
 import 'package:aash_india/presentations/screens/profile/profile_page.dart';
 import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/app_drawer.dart';
+import 'package:aash_india/presentations/widgets/banner_carousel.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -69,7 +68,7 @@ class _HomePageState extends State<HomePage> {
         selectedCity = city ?? cities[0];
       });
     } catch (error) {
-      log(error.toString());
+      //
     }
   }
 
@@ -224,8 +223,18 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  BlocProvider.of<NavigationBloc>(context)
-                                      .add(PageTapped(2));
+                                  if (BlocProvider.of<AuthBloc>(context).state
+                                      is AuthSuccess) {
+                                    BlocProvider.of<NavigationBloc>(context)
+                                        .add(PageTapped(2));
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginPage()),
+                                    );
+                                  }
                                 },
                                 child: Column(
                                   children: [
@@ -251,22 +260,47 @@ class _HomePageState extends State<HomePage> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  BlocProvider.of<NavigationBloc>(context)
-                                      .add(PageTapped(3));
+                                  if (BlocProvider.of<AuthBloc>(context).state
+                                      is AuthSuccess) {
+                                    BlocProvider.of<NavigationBloc>(context)
+                                        .add(PageTapped(3));
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginPage()),
+                                    );
+                                  }
                                 },
-                                child: Column(
-                                  children: [
-                                    Icon(Icons.person,
-                                        color: Color(0xFF344e41)),
-                                    const SizedBox(height: 4),
-                                    Text('Profile'),
-                                  ],
+                                child: BlocBuilder<AuthBloc, AuthState>(
+                                  builder: (context, state) {
+                                    if (state is AuthSuccess) {
+                                      return Column(
+                                        children: [
+                                          Icon(Icons.person,
+                                              color: Color(0xFF344e41)),
+                                          const SizedBox(height: 4),
+                                          Text('Profile'),
+                                        ],
+                                      );
+                                    }
+                                    return Column(
+                                      children: [
+                                        Icon(Icons.login,
+                                            color: Color(0xFF344e41)),
+                                        const SizedBox(height: 4),
+                                        Text('Login'),
+                                      ],
+                                    );
+                                  },
                                 ),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 10),
+                        BannerCarousel(),
                         Container(
                           color: Colors.grey.shade100,
                           padding: const EdgeInsets.fromLTRB(4, 24, 4, 0),
@@ -349,15 +383,29 @@ class _HomePageState extends State<HomePage> {
                                         itemBuilder: (context, index) {
                                           final coupon = state.coupons[index];
                                           return GestureDetector(
-                                            onTap: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CouponDetail(
-                                                  id: coupon['_id'],
-                                                ),
-                                              ),
-                                            ),
+                                            onTap: () {
+                                              if (BlocProvider.of<AuthBloc>(
+                                                      context)
+                                                  .state is AuthSuccess) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CouponDetail(
+                                                      id: coupon['_id'],
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        LoginPage(),
+                                                  ),
+                                                );
+                                              }
+                                            },
                                             child: Card(
                                               elevation: 2,
                                               color: Colors.white,
