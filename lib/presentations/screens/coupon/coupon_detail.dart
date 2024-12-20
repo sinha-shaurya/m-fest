@@ -8,9 +8,11 @@ import 'package:aash_india/bloc/singleCoupon/single_coupon_event.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/utils/date_formatter.dart';
+import 'package:aash_india/utils/format_phone_number.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class CouponDetail extends StatefulWidget {
   final String id;
@@ -343,6 +345,35 @@ class _CouponDetailState extends State<CouponDetail> {
     TextEditingController mobileNumberController = TextEditingController();
     int count = 1;
 
+    Future<void> pickContact() async {
+      if (await FlutterContacts.requestPermission()) {
+        try {
+          final contact = await FlutterContacts.openExternalPick();
+          if (contact != null && contact.phones.isNotEmpty) {
+            mobileNumberController.text = formatPhoneNumber(contact.phones.first.number);
+          } else {
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('No phone number found for the selected contact'),
+              backgroundColor: Colors.red,
+            ));
+          }
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Failed to pick a contact'),
+            backgroundColor: Colors.red,
+          ));
+        }
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Contacts permission denied'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -351,10 +382,20 @@ class _CouponDetailState extends State<CouponDetail> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: mobileNumberController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(labelText: "Mobile Number"),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: mobileNumberController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(labelText: "Mobile Number"),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.contacts, color: Color(0xFF386641)),
+                    onPressed: pickContact,
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               Row(
