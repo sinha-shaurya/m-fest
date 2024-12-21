@@ -4,7 +4,6 @@ import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/home/complete_profile.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
-import 'package:aash_india/presentations/screens/landing/landing_page.dart';
 import 'package:aash_india/presentations/screens/profile/waiting_approval.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,14 +26,6 @@ class SplashScreenState extends State<SplashScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const HomePage()),
-      (Route<dynamic> route) => false,
-    );
-  }
-
-  void _navigateToLanding(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LandingPage()),
       (Route<dynamic> route) => false,
     );
   }
@@ -70,24 +61,19 @@ class SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        _navigateToHome(context);
-        return;
-        // if (state is AuthSuccess) {
-        //   _navigateToHome(context);
-        //   return;
-        // } else if (state is AuthNotApproved) {
-        //   _navigateToWaitingApproval(context);
-        //   return;
-        // } else if (state is AuthIncomplete) {
-        //   _navigateToCompleteProfile(context, state);
-        //   return;
-        // } else if (state is AuthFailed) {
-        //   _handleError(context, state);
-        //   return;
-        // } else {
-        //   _navigateToLanding(context);
-        //   return;
-        // }
+        if (state is AuthNotApproved) {
+          _navigateToWaitingApproval(context);
+          return;
+        } else if (state is AuthIncomplete) {
+          _navigateToCompleteProfile(context, state);
+          return;
+        } else if (state is AuthFailed) {
+          _handleError(context, state);
+          return;
+        } else {
+          _navigateToHome(context);
+          return;
+        }
       },
       child: const Scaffold(
         body: Center(
@@ -96,7 +82,7 @@ class SplashScreenState extends State<SplashScreen> {
             children: [
               SizedBox(height: 20),
               CircularProgressIndicator(
-                color: AppColors.primaryColor,
+                color: Color(0xFF386641),
               ),
             ],
           ),
