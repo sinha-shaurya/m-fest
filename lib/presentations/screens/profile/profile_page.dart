@@ -102,6 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     const SizedBox(height: 20),
+                    _buildCouponAvailable(int.parse(state.coupons ?? '0')),
+                    const SizedBox(height: 20),
                     _buildInfoSection(
                       title: 'Personal Information',
                       content: [
@@ -204,6 +206,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Widget _buildCouponAvailable(int couponCount) {
+    return Container(
+      decoration: _boxDecoration(),
+      child: ListTile(
+        leading: Icon(Icons.card_giftcard, color: Color(0xFF344e41)),
+        title: Text('Available Coupons'),
+        trailing: Text(
+          couponCount.toString(),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoSection({
     required String title,
     required List<Widget> content,
@@ -295,8 +311,8 @@ class _ProfilePageState extends State<ProfilePage> {
   BoxDecoration _boxDecoration() {
     return BoxDecoration(
       color: Colors.white54,
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(width: 0.25),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(width: 0.25, color: Colors.transparent),
     );
   }
 
