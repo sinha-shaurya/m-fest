@@ -23,6 +23,7 @@ import 'package:aash_india/presentations/widgets/banner_carousel.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         selectedCity = city ?? cities[0];
       });
     } catch (error) {
-      //
+      // ignore: avoid_print
     }
   }
 
@@ -92,8 +93,17 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         BlocListener<CouponBloc, CouponState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is CouponFailed) {
+              if (state.error == 'No user found with this mobile number') {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('User is not on this platform'),
+                  backgroundColor: AppColors.errorColor,
+                ));
+                await Share.share(
+                    'Hey, Download this app to get exclusive coupons and discounts at nearby shops');
+                return;
+              }
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(state.error),
                 backgroundColor: AppColors.errorColor,

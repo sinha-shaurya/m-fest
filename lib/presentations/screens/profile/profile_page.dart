@@ -196,7 +196,8 @@ class _ProfilePageState extends State<ProfilePage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
         child: Image.asset(
-          male ? 'assets/man.jpeg' : 'assets/woman.jpeg',
+          'assets/Unknown_person.jpg',
+          // male ? 'assets/man.jpeg' : 'assets/woman.jpeg',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           height: 165,
