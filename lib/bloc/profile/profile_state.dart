@@ -18,6 +18,7 @@ class ProfileFetched extends ProfileState {
   final String city;
   final String state;
   final String pincode;
+  final String? coupons;
   final String type;
   final String? shopName;
   final String? shopCategory;
@@ -29,6 +30,7 @@ class ProfileFetched extends ProfileState {
       required this.gender,
       required this.city,
       this.shopCategory,
+      this.coupons,
       this.shopName,
       required this.type,
       required this.state,

@@ -47,12 +47,24 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               type: 'partner',
             ));
           } else if (userType == 'customer') {
+            final response = await http.get(
+              Uri.parse('$baseUrl/api/coupon/coupon-count'),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token'
+              },
+            );
+            int couponCount = 0;
+            if (response.statusCode == 200) {
+              couponCount = jsonDecode(response.body)['couponCount'];
+            }
             emit(ProfileFetched(
               id: res['_id'] ?? "",
               fname: res['data']['firstname'] ?? "",
               lname: res['data']['lastname'] ?? "",
               phone: res['data']['phonenumber'] ?? "",
               gender: res['data']['gender'] ?? "",
+              coupons: couponCount.toString(),
               city: res['data']['city'] ?? "",
               state: res['data']['state'] ?? "",
               pincode: res['data']['pincode'] ?? "",
