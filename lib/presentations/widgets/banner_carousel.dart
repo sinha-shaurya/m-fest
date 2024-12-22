@@ -114,7 +114,7 @@ class BannerCarouselState extends State<BannerCarousel> {
                 child: Icon(
                   Icons.broken_image,
                   color: Colors.grey,
-                  size: 50,
+                  size: 160,
                 ),
               );
             },

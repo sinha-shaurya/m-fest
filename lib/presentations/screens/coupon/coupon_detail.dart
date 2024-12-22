@@ -350,7 +350,8 @@ class _CouponDetailState extends State<CouponDetail> {
         try {
           final contact = await FlutterContacts.openExternalPick();
           if (contact != null && contact.phones.isNotEmpty) {
-            mobileNumberController.text = formatPhoneNumber(contact.phones.first.number);
+            mobileNumberController.text =
+                formatPhoneNumber(contact.phones.first.number);
           } else {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -433,7 +434,7 @@ class _CouponDetailState extends State<CouponDetail> {
               builder: (context, state) {
                 if (state is CouponLoading) {
                   return CircularProgressIndicator(
-                    color: AppColors.primaryColor,
+                    color: Color(0xFF386641),
                   );
                 }
                 return ElevatedButton(
