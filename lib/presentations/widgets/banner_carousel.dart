@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BannerCarousel extends StatefulWidget {
-  const BannerCarousel({super.key});
+  final String city;
+  const BannerCarousel({this.city = "", super.key});
 
   @override
   BannerCarouselState createState() => BannerCarouselState();
@@ -40,7 +41,8 @@ class BannerCarouselState extends State<BannerCarousel> {
   }
 
   void _loadSponsors() {
-    BlocProvider.of<SponsorBloc>(context).add(GetAllSponsors(isCarousel: true));
+    BlocProvider.of<SponsorBloc>(context)
+        .add(GetAllSponsors(city: widget.city, isCarousel: true));
   }
 
   @override

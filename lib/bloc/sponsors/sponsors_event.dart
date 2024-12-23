@@ -8,8 +8,9 @@ abstract class SponsorEvent extends Equatable {
 }
 
 class GetAllSponsors extends SponsorEvent {
+  final String? city;
   final bool isCarousel;
-  const GetAllSponsors({this.isCarousel = false});
+  const GetAllSponsors({this.city, this.isCarousel = false});
 
   @override
   List<Object> get props => [isCarousel];

@@ -11,6 +11,8 @@ import 'package:aash_india/bloc/navigation/navigation_state.dart';
 import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_event.dart';
 import 'package:aash_india/bloc/profile/profile_state.dart';
+import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
+import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:aash_india/presentations/screens/coupon/coupon_detail.dart';
@@ -71,6 +73,14 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       // ignore: avoid_print
     }
+  }
+
+  setCity(String city) async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('selectedCity', city);
+    setState(() {
+      selectedCity = city;
+    });
   }
 
   @override
@@ -159,11 +169,11 @@ class _HomePageState extends State<HomePage> {
                 ? PopupMenuButton<String>(
                     icon: Icon(Icons.pin_drop, color: Color(0xFF344e41)),
                     onSelected: (String newValue) {
-                      setState(() {
-                        selectedCity = newValue;
-                      });
+                      setCity(newValue);
                       BlocProvider.of<CouponBloc>(context)
                           .add(GetAllCoupons(city: newValue));
+                      BlocProvider.of<SponsorBloc>(context)
+                          .add(GetAllSponsors(city: newValue));
                     },
                     itemBuilder: (BuildContext context) {
                       return cities
@@ -310,7 +320,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        BannerCarousel(),
+                        BannerCarousel(
+                          city: selectedCity ?? "",
+                        ),
                         Container(
                           color: Colors.grey.shade100,
                           padding: const EdgeInsets.fromLTRB(4, 24, 4, 0),
