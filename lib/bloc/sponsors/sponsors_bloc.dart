@@ -4,6 +4,7 @@ import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
   SponsorBloc() : super(SponsorInitial()) {
@@ -17,8 +18,15 @@ class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
       GetAllSponsors event, Emitter<SponsorState> emit) async {
     emit(SponsorLoading());
     try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final selectedCity = prefs.getString('selectedCity');
+      final uri = Uri.parse('$baseUrl/api/link').replace(
+        queryParameters: {
+          'city': event.city ?? selectedCity ?? '',
+        },
+      );
       final response = await http.get(
-        Uri.parse('$baseUrl/api/link'),
+        uri,
         headers: {'Content-Type': 'application/json'},
       );
 
