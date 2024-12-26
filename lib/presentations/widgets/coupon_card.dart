@@ -1,3 +1,4 @@
+import 'package:aash_india/presentations/widgets/confirmation_dialog.dart';
 import 'package:aash_india/utils/date_formatter.dart';
 import 'package:flutter/material.dart';
 
@@ -10,16 +11,20 @@ class CouponCard extends StatelessWidget {
   final String? buttonTitle;
   final Color? color;
   final VoidCallback? onTap;
+  final VoidCallback? onCancel;
   final int? price;
   final DateTime? validity;
+  final String? address;
   const CouponCard({
     required this.title,
     this.onTap,
+    this.onCancel,
     this.buttonTitle,
     this.category,
     this.id,
     this.price,
     this.color,
+    this.address,
     this.validity,
     this.active = true,
     required this.discountPercent,
@@ -32,7 +37,7 @@ class CouponCard extends StatelessWidget {
         active ? (color ?? Color(0xFF344e41)) : Colors.grey.shade700;
 
     return Container(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(12.0),
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -87,6 +92,17 @@ class CouponCard extends StatelessWidget {
                         color: cardColor,
                       ),
                     ),
+                    address != null
+                        ? Text(
+                            address!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade800,
+                            ),
+                          )
+                        : const SizedBox(height: 0),
                     const SizedBox(height: 5),
                     Row(
                       children: [
@@ -101,6 +117,21 @@ class CouponCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
+                        active
+                            ? TextButton(
+                                onPressed: () => showConfirmationDialog(context,
+                                    title:
+                                        'Do you really want to remove this coupon?',
+                                    onConfirm: onCancel,
+                                    confirmText: 'remove'),
+                                child: Text(
+                                  'remove',
+                                  style: TextStyle(
+                                    color: Color(0xFF344e41),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
                         ElevatedButton.icon(
                           onPressed: onTap,
                           style: ElevatedButton.styleFrom(

@@ -156,7 +156,19 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           couponsList = [];
         }
 
-        emit(CouponLoaded(couponsList));
+        final response = await http.get(
+          Uri.parse('$baseUrl/api/coupon/coupon-count'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token'
+          },
+        );
+        int couponCount = 0;
+        if (response.statusCode == 200) {
+          couponCount = jsonDecode(response.body)['couponCount'];
+        }
+
+        emit(CouponLoaded(couponsList, couponCount: couponCount));
       } else {
         emit(CouponFailed('Failed to fetch availed coupons.'));
       }
