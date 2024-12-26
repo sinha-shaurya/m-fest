@@ -19,6 +19,10 @@ class Coupons extends StatefulWidget {
 
 class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey1 =
+      GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey2 =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -49,9 +53,11 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
         appBar: AppBar(
           title: const Text('Coupons'),
           bottom: TabBar(
+            labelColor: Color(0xFF344e41),
+            indicatorColor: Color(0xFF344e41),
             controller: _tabController,
             tabs: const [
-              Tab(text: 'Availed'),
+              Tab(text: 'Available'),
               Tab(text: 'History'),
             ],
           ),
@@ -60,17 +66,48 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
           controller: _tabController,
           children: [
             RefreshIndicator(
+              key: _refreshIndicatorKey1,
               onRefresh: () async =>
                   BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons()),
               child: BlocBuilder<CouponBloc, CouponState>(
                 builder: (context, state) {
                   if (state is CouponLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: Color(0xFF344e41),
+                    ));
                   } else if (state is CouponLoaded) {
                     final activeCoupons = state.coupons
                         .where((coupon) => coupon['status'] != 'EXPIRED')
                         .toList();
-                    return buildCouponList(coupons: activeCoupons);
+                    return Column(
+                      children: [
+                        SizedBox(height: 6),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white54,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                width: 0.25, color: Colors.transparent),
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.card_giftcard,
+                                color: Color(0xFF344e41)),
+                            title: Text(
+                              'Available Coupons',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            trailing: Text(
+                              state.couponCount.toString(),
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.normal),
+                            ),
+                          ),
+                        ),
+                        buildCouponList(coupons: activeCoupons),
+                      ],
+                    );
                   } else if (state is CouponFailed) {
                     return Center(child: Text(state.error));
                   } else {
@@ -81,12 +118,16 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
               ),
             ),
             RefreshIndicator(
+              key: _refreshIndicatorKey2,
               onRefresh: () async =>
                   BlocProvider.of<CouponBloc>(context).add(GetAvailedCoupons()),
               child: BlocBuilder<CouponBloc, CouponState>(
                 builder: (context, state) {
                   if (state is CouponLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: Color(0xFF344e41),
+                    ));
                   } else if (state is CouponLoaded) {
                     final expiredCoupons = state.coupons
                         .where((coupon) => coupon['status'] == 'EXPIRED')
@@ -110,15 +151,36 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
   Widget buildCouponList(
       {required List<Map<String, dynamic>> coupons, bool expired = false}) {
     if (coupons.isEmpty) {
-      return const Center(child: Text('No coupons available.'));
+      return SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 12),
+            const Text('No coupons available.'),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(
+      shrinkWrap: true,
       itemCount: coupons.length,
       itemBuilder: (context, index) {
         var coupon = coupons[index];
 
         return CouponCard(
+          onCancel: () async {
+            BlocProvider.of<SingleCouponBloc>(context)
+                .add(CouponRemoveEvent(coupon['_id'], coupon['ownerId']));
+            await Future.delayed(Duration(seconds: 2));
+            if (expired) {
+              _refreshIndicatorKey2.currentState?.show();
+            } else {
+              _refreshIndicatorKey1.currentState?.show();
+            }
+          },
           onTap: () async {
             if (!expired && coupon['status'] == 'REDEEMED') {
               Navigator.push(
@@ -152,6 +214,8 @@ class _CouponsState extends State<Coupons> with SingleTickerProviderStateMixin {
                   ? "Paid ₹${coupon['totalPrice']}"
                   : "Pay ₹${coupon['totalPrice']}",
           title: coupon['title'],
+          category: coupon['category'][0],
+          address: coupon['ownerAddress'],
           discountPercent: coupon['discountPercentage'],
           active: coupon['active'],
           validity: DateTime.parse(coupon['validTill']),

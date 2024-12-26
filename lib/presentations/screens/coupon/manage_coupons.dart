@@ -45,7 +45,7 @@ class _ManageCouponsState extends State<ManageCoupons>
           bottom: TabBar(
             controller: _tabController,
             tabs: const [
-              Tab(text: 'Live'),
+              Tab(text: 'Active'),
               Tab(text: 'Unbilled'),
             ],
           ),
@@ -110,6 +110,7 @@ class _ManageCouponsState extends State<ManageCoupons>
 
     return ListView.builder(
       itemCount: coupons.length,
+      shrinkWrap: true,
       itemBuilder: (context, index) {
         var coupon = coupons[index];
         return Card(

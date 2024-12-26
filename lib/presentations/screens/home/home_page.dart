@@ -56,6 +56,8 @@ class _HomePageState extends State<HomePage> {
     if (mounted) {
       BlocProvider.of<CouponBloc>(context)
           .add(GetAllCoupons(city: selectedCity));
+      BlocProvider.of<SponsorBloc>(context)
+          .add(GetAllSponsors(isCarousel: true, city: selectedCity));
     }
     setState(() {
       selectedCity = null;
@@ -324,8 +326,12 @@ class _HomePageState extends State<HomePage> {
                           city: selectedCity ?? "",
                         ),
                         Container(
-                          color: Colors.grey.shade100,
                           padding: const EdgeInsets.fromLTRB(4, 24, 4, 0),
+                          decoration: BoxDecoration(
+                            border: Border.fromBorderSide(
+                                BorderSide(color: Colors.grey.shade100)),
+                            color: Colors.grey.shade100,
+                          ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +362,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                               const SizedBox(height: 10),
                               _buildCategories(),
-                              const SizedBox(height: 10),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0),
@@ -392,11 +397,13 @@ class _HomePageState extends State<HomePage> {
                                         );
                                       }
                                       return GridView.builder(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
                                         gridDelegate:
                                             const SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 3,
-                                          crossAxisSpacing: 8,
-                                          mainAxisSpacing: 8,
+                                          crossAxisSpacing: 12,
+                                          mainAxisSpacing: 12,
                                         ),
                                         shrinkWrap: true,
                                         physics:
@@ -414,8 +421,7 @@ class _HomePageState extends State<HomePage> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         CouponDetail(
-                                                      id: coupon['_id'],
-                                                    ),
+                                                            id: coupon['_id']),
                                                   ),
                                                 );
                                               } else {
@@ -428,32 +434,61 @@ class _HomePageState extends State<HomePage> {
                                                 );
                                               }
                                             },
-                                            child: Card(
-                                              elevation: 2,
-                                              color: Colors.white,
-                                              shape: RoundedRectangleBorder(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFF344e41),
                                                 borderRadius:
-                                                    BorderRadius.circular(12),
+                                                    BorderRadius.circular(16),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    offset: Offset(0, 1),
+                                                    blurRadius: 2,
+                                                    spreadRadius: 2,
+                                                    color: Colors.black38,
+                                                  )
+                                                ],
                                               ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(16.0),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "${coupon['discountPercentage']}%",
-                                                      style: TextStyle(
-                                                        fontSize: 22,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF2E7D32),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(
+                                                    height: 2,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        "${coupon['discountPercentage']}",
+                                                        style: TextStyle(
+                                                          fontSize: 28,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Flexible(
+                                                      Icon(
+                                                        Icons.percent,
+                                                        size: 24,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Flexible(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 4,
+                                                          vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                      ),
                                                       child: Text(
                                                         coupon['title']
                                                             .toString(),
@@ -463,47 +498,37 @@ class _HomePageState extends State<HomePage> {
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
-                                                          fontSize: 14,
+                                                          fontSize: 12,
                                                           fontWeight:
-                                                              FontWeight.w500,
+                                                              FontWeight.w600,
                                                           color:
-                                                              Color(0xFF424242),
+                                                              Color(0xFF344e41),
                                                         ),
                                                       ),
                                                     ),
-                                                    const SizedBox(height: 4),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(Icons.store,
-                                                            color: Colors
-                                                                .grey.shade700,
-                                                            size: 20),
-                                                        const SizedBox(
-                                                            width: 4),
-                                                        Text(
-                                                          'Shop',
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: Colors
-                                                                .grey.shade600,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    coupon['ownerAddress'],
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 8,
+                                                      color: Colors.white,
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           );
                                         },
                                       );
                                     }
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        backgroundColor: Color(0xFF344e41),
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 12.0),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          backgroundColor: Color(0xFF344e41),
+                                        ),
                                       ),
                                     );
                                   },

@@ -257,7 +257,7 @@ class _CouponDetailState extends State<CouponDetail> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: couponData['redeemed']
-                                        ? Colors.grey.shade400
+                                        ? Colors.grey.shade500
                                         : Color(0xFF386641),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 40.0, vertical: 15.0),
@@ -267,18 +267,27 @@ class _CouponDetailState extends State<CouponDetail> {
                                   ),
                                   child: couponState is CouponLoading
                                       ? const CircularProgressIndicator(
-                                          color: AppColors.primaryColor,
+                                          color: Color(0xFF386641),
                                         )
-                                      : Text(
-                                          couponData['redeemed']
-                                              ? 'Coupon Availed'
-                                              : 'Avail Coupon',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: couponData['redeemed']
-                                                ? Colors.grey.shade800
-                                                : Colors.white,
-                                          ),
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              couponData['redeemed']
+                                                  ? 'Already Added'
+                                                  : 'Add to Cart',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(width: 12),
+                                            Icon(
+                                              Icons.shopping_bag,
+                                              color: Colors.white,
+                                            ),
+                                          ],
                                         ),
                                 ),
                               );
