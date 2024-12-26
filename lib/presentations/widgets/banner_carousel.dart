@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
-import 'package:aash_india/core/constants/theme.dart';
+import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,41 +14,17 @@ class BannerCarousel extends StatefulWidget {
 }
 
 class BannerCarouselState extends State<BannerCarousel> {
-  final PageController _pageController = PageController();
-  Timer? _timer;
-  int _currentIndex = 0;
   List sponsors = [];
 
   @override
   void initState() {
     super.initState();
     _loadSponsors();
-
-    _timer = Timer.periodic(Duration(seconds: 3), (Timer timer) {
-      if (_pageController.hasClients) {
-        _currentIndex++;
-        if (_currentIndex >= sponsors.length) {
-          _currentIndex = 0;
-        }
-        _pageController.animateToPage(
-          _currentIndex,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeIn,
-        );
-      }
-    });
   }
 
   void _loadSponsors() {
     BlocProvider.of<SponsorBloc>(context)
         .add(GetAllSponsors(city: widget.city, isCarousel: true));
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override
@@ -61,75 +36,68 @@ class BannerCarouselState extends State<BannerCarousel> {
           if (sponsors.isEmpty) {
             return const SizedBox();
           }
-          return SizedBox(
-            height: 220,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: sponsors.length,
-              itemBuilder: (context, index) {
-                return _buildSponsorItem(
-                  logoPath: sponsors[index]['img'],
-                  title: sponsors[index]['title'],
-                );
-              },
-            ),
-          );
-        }
-        return Center(
-          child: CircularProgressIndicator(
-            backgroundColor: AppColors.primaryColor,
-          ),
-        );
-      },
-    );
-  }
+          return Container(
+              height: 220,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  border: Border.fromBorderSide(
+                      BorderSide(color: Colors.grey.shade100))),
+              child: CarouselSlider.builder(
+                itemCount: sponsors.length,
+                itemBuilder: (context, index, realIndex) {
+                  return Image.network(
+                    sponsors[index]['img'],
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      } else {
+                        double progress =
+                            loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    (loadingProgress.expectedTotalBytes ?? 1)
+                                : 0;
 
-  Widget _buildSponsorItem({required String logoPath, required String title}) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.network(
-            logoPath,
-            fit: BoxFit.contain,
-            height: 160,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) {
-                return child;
-              }
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          (loadingProgress.expectedTotalBytes ?? 1)
-                      : null,
+                        return Container(
+                          height: 220,
+                          width: 220,
+                          color: Colors.grey.shade200,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                value: progress,
+                                backgroundColor:
+                                    Colors.grey, // Full progress color
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.grey.shade800), // Progress color
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  );
+                },
+                options: CarouselOptions(
+                  height: 220,
+                  aspectRatio: 3 / 4,
+                  viewportFraction: 0.55,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: true,
+                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.3,
+                  scrollDirection: Axis.horizontal,
                 ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey.shade300,
-                child: Icon(
-                  Icons.broken_image,
-                  color: Colors.grey,
-                  size: 160,
-                ),
-              );
-            },
-          ),
-          SizedBox(
-            height: 6,
-          ),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
+              ));
+        }
+        return const SizedBox();
+      },
     );
   }
 }
