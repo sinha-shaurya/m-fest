@@ -12,7 +12,8 @@ class CouponLoading extends CouponState {}
 
 class CouponLoaded extends CouponState {
   final List<Map<String, dynamic>> coupons;
-  const CouponLoaded(this.coupons);
+  final int? couponCount;
+  const CouponLoaded(this.coupons, {this.couponCount});
 
   @override
   List<Object> get props => [coupons];

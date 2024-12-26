@@ -32,6 +32,15 @@ class ScanSuccess extends SingleCouponState {
   List<Object> get props => [message];
 }
 
+class RemoveSuccess extends SingleCouponState {
+  final String message;
+
+  const RemoveSuccess(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class SingleCouponFailed extends SingleCouponState {
   final String error;
 
