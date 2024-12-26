@@ -184,14 +184,18 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     return;
                                   }
                                   BlocProvider.of<AuthBloc>(context).add(
-                                      AuthResetPassword(
-                                          email: _emailController.text,
-                                          otp: _otpController.text,
-                                          password: _passwordController.text));
+                                    AuthResetPassword(
+                                      email: _emailController.text.trim(),
+                                      otp: _otpController.text.trim(),
+                                      password: _passwordController.text.trim(),
+                                    ),
+                                  );
                                 } else {
                                   BlocProvider.of<AuthBloc>(context).add(
-                                      AuthForgotPassword(
-                                          _emailController.text));
+                                    AuthForgotPassword(
+                                      _emailController.text.trim(),
+                                    ),
+                                  );
                                 }
                               },
                               style: ElevatedButton.styleFrom(

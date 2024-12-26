@@ -265,10 +265,10 @@ class _SignUpState extends State<SignUp> {
                             } else {
                               BlocProvider.of<AuthBloc>(context).add(
                                 AuthRegister(
-                                  name: _nameController.text,
+                                  name: _nameController.text.trim(),
                                   type: isCustomer ? 'customer' : 'partner',
-                                  email: _emailController.text,
-                                  password: _passwordController.text,
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text.trim(),
                                 ),
                               );
                             }
