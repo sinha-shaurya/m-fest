@@ -172,9 +172,12 @@ class _LoginPageState extends State<LoginPage> {
                               ));
                               return;
                             } else {
-                              BlocProvider.of<AuthBloc>(context).add(AuthLogin(
-                                  _emailController.text,
-                                  _passwordController.text));
+                              BlocProvider.of<AuthBloc>(context).add(
+                                AuthLogin(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(
