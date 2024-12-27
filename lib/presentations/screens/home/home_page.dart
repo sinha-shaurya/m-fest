@@ -579,41 +579,6 @@ class _HomePageState extends State<HomePage> {
             return Container();
           },
         ),
-        // bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
-        //   builder: (context, state) {
-        //     return BottomNavigationBar(
-        //       currentIndex: _getSelectedIndex(state),
-        //       onTap: (index) {
-        //         if (index == 0 && !isPartner) {
-        //           BlocProvider.of<CouponBloc>(context).add(GetAllCoupons());
-        //         }
-        //         BlocProvider.of<NavigationBloc>(context)
-        //             .add(PageTapped(index));
-        //       },
-        //       items: [
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.home),
-        //           label: 'Home',
-        //         ),
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.pages),
-        //           label: 'Banners',
-        //         ),
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.topic),
-        //           label: 'Coupons',
-        //         ),
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.person),
-        //           label: 'Profile',
-        //         ),
-        //       ],
-        //       selectedItemColor: appTheme(context).primaryColor,
-        //       unselectedItemColor: Colors.grey,
-        //       type: BottomNavigationBarType.fixed,
-        //     );
-        //   },
-        // ),
       ),
     );
   }

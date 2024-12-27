@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
-          scaffoldBackgroundColor: Colors.grey.shade200,
+          scaffoldBackgroundColor: Colors.grey.shade100,
           progressIndicatorTheme: ProgressIndicatorThemeData(
             color: Colors.white,
           ),
