@@ -13,8 +13,6 @@ class GetAllCoupons extends CouponEvent {
   const GetAllCoupons({this.city = 'all', this.search});
 }
 
-class GetLanding extends CouponEvent {}
-
 class FilterCoupons extends CouponEvent {
   final String category;
   const FilterCoupons(this.category);
@@ -63,23 +61,4 @@ class CheckRedeem extends CouponEvent {
 
 class GetAvailedCoupons extends CouponEvent {
   const GetAvailedCoupons();
-}
-
-class CreateCouponEvent extends CouponEvent {
-  final String title;
-  final String category;
-  final int discountPercentage;
-  final DateTime validTill;
-  final Map<String, dynamic>? style;
-  final bool? active;
-  const CreateCouponEvent(
-      {required this.title,
-      required this.category,
-      required this.discountPercentage,
-      required this.validTill,
-      this.style,
-      this.active = true});
-
-  @override
-  List<Object> get props => [title, category, discountPercentage, validTill];
 }

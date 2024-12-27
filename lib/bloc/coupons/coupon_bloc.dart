@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
@@ -10,7 +11,6 @@ import 'package:http/http.dart' as http;
 class CouponBloc extends Bloc<CouponEvent, CouponState> {
   CouponBloc() : super(CouponInitial()) {
     on<GetAllCoupons>(_fetchAllCoupons);
-    on<CreateCouponEvent>(_onCreateCoupon);
     on<FilterCoupons>(_onFilterCoupons);
     on<AvailCouponEvent>(_onAvailCoupon);
     on<GetAvailedCoupons>(_onGetAvailedCoupons);
@@ -18,7 +18,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     on<GetPartnerActiveCoupons>(_onPartnerActiveCouponFetch);
     on<UpdateCouponAmount>(_onUpdateCouponAmount);
     on<TransferCouponEvent>(_onTransferCoupon);
-    on<GetLanding>(_fetchLanding);
   }
 
   final String baseUrl =
@@ -51,43 +50,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchLandingCoupons() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/api/landing/get-coupuns'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(data);
-    } else {
-      throw Exception('Failed to load coupons');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> _fetchLandingShops() async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/api/landing/get-shops'));
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return List<Map<String, dynamic>>.from(data);
-    } else {
-      throw Exception('Failed to load shops');
-    }
-  }
-
-  Future<void> _fetchLanding(
-      GetLanding event, Emitter<CouponState> emit) async {
-    emit(CouponLoading());
-    try {
-      final List<Map<String, dynamic>> coupons = await _fetchLandingCoupons();
-      final List<Map<String, dynamic>> shops = await _fetchLandingShops();
-
-      emit(LandingLoaded(coupons: coupons, shops: shops));
-    } catch (error) {
-      emit(CouponFailed('Failed to load landing data: ${error.toString()}'));
-    }
-  }
-
   Future<void> _fetchAllCoupons(
       GetAllCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
@@ -100,8 +62,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           await prefs.setString('selectedState', event.city!);
         }
       }
-      final uri = Uri.parse('$baseUrl/api/coupon/getall').replace(
-          queryParameters: {'city': event.city, 'search': event.search});
+      final uri = Uri.parse('$baseUrl/api/coupon/getall?city=${event.city}&search=${event.search}');
       final response = await http.get(
         uri,
         headers: {
@@ -118,8 +79,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         } else {
           emit(CouponLoaded(coupons.reversed.toList()));
         }
-      } else {
-        emit(CouponFailed('Something went wrong'));
       }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
@@ -390,8 +349,8 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         final token = prefs.getString('token');
 
         final selectedCity = prefs.getString('selectedCity');
-        final uri = Uri.parse('$baseUrl/api/coupon/getall')
-            .replace(queryParameters: {'city': selectedCity});
+        final uri = Uri.parse('$baseUrl/api/coupon/getall').replace(
+            queryParameters: {'city': selectedCity});
         final response = await http.get(
           uri,
           headers: {
@@ -409,6 +368,8 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
             return;
           }
         } else {
+          log(response.statusCode.toString());
+          log(response.toString());
           emit(CouponFailed('Something went wrong'));
           return;
         }
@@ -419,46 +380,6 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       }).toList();
 
       emit(CouponLoaded(event.category == 'All' ? coupons : filteredCoupons));
-    } catch (error) {
-      emit(CouponFailed('Unknown error occurred.'));
-    }
-  }
-
-  Future<void> _onCreateCoupon(
-      CreateCouponEvent event, Emitter<CouponState> emit) async {
-    emit(CouponLoading());
-
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
-        emit(CouponFailed('Unable to create coupon'));
-        return;
-      }
-      final validTillString = event.validTill.toIso8601String();
-      final body = jsonEncode({
-        'title': event.title,
-        'category': event.category,
-        'discountPercentage': event.discountPercentage,
-        'validTill': validTillString,
-        'style': {...event.style!},
-        'active': event.active,
-      });
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/coupon/create'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
-        },
-        body: body,
-      );
-      if (response.statusCode == 201) {
-        emit(CouponSuccess('Coupon created successfully.'));
-      } else {
-        final errorData = jsonDecode(response.body);
-        emit(CouponFailed(errorData['message'] ?? 'Failed to create coupon'));
-      }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
     }
