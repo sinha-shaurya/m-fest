@@ -7,6 +7,7 @@ import 'package:aash_india/presentations/screens/home/home_page.dart';
 import 'package:aash_india/presentations/screens/profile/waiting_approval.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +17,39 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
+  bool _isUpdateAvailable = false;
+
+  Future<void> checkForUpdate() async {
+    try {
+      final updateInfo = await InAppUpdate.checkForUpdate();
+      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+        setState(() {
+          _isUpdateAvailable = true;
+        });
+        await performUpdate();
+      } else {
+        if (!mounted) return;
+        BlocProvider.of<AuthBloc>(context).add(AuthCheck());
+      }
+    } catch (e) {
+      if (!mounted) return;
+      BlocProvider.of<AuthBloc>(context).add(AuthCheck());
+    }
+  }
+
+  Future<void> performUpdate() async {
+    try {
+      await InAppUpdate.performImmediateUpdate();
+    } catch (e) {
+      if (!mounted) return;
+      BlocProvider.of<AuthBloc>(context).add(AuthCheck());
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<AuthBloc>(context).add(AuthCheck());
+    checkForUpdate();
   }
 
   void _navigateToHome(BuildContext context) {
@@ -75,15 +105,23 @@ class SplashScreenState extends State<SplashScreen> {
           return;
         }
       },
-      child: const Scaffold(
-        body: Center(
+      child: Scaffold(
+        body: SizedBox(
+          width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              CircularProgressIndicator(
-                color: Color(0xFF386641),
-              ),
+              Image.asset('assets/logo.png', height: 140),
+              _isUpdateAvailable
+                  ? CircularProgressIndicator(
+                      color: const Color.fromARGB(255, 80, 156, 95),
+                      strokeWidth: 8,
+                    )
+                  : CircularProgressIndicator(
+                      color: const Color(0xFF386641),
+                      strokeWidth: 8,
+                    ),
             ],
           ),
         ),
