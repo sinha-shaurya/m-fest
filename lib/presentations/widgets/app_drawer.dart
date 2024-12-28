@@ -9,6 +9,7 @@ import 'package:aash_india/presentations/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -171,7 +172,15 @@ class AppDrawer extends StatelessWidget {
                     'Rate us',
                     style: TextStyle(color: Color(0xFF386641)),
                   ),
-                  onTap: () {
+                  onTap: () async {
+                    const url =
+                        'https://play.google.com/store/apps/details?id=com.mfest.aash_india';
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url));
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                    if (!context.mounted) return;
                     Navigator.pop(context);
                   },
                 ),
@@ -187,7 +196,7 @@ class AppDrawer extends StatelessWidget {
                   ),
                   onTap: () async {
                     final message =
-                        'Check out Aash India! Discover exclusive coupons and discounts at nearby shops!';
+                        'Discover exclusive coupons and discounts at nearby shops with Aash India! Download the app now: https://play.google.com/store/apps/details?id=com.mfest.aash_india';
                     Navigator.pop(context);
                     await Share.share(
                       message,
