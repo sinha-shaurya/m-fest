@@ -76,6 +76,7 @@ class _CouponDetailState extends State<CouponDetail> {
             final String category = couponData['category'].join(', ');
             final int discountPercentage = couponData['discountPercentage'];
             final DateTime validTill = DateTime.parse(couponData['validTill']);
+            final String desc = couponData['description'];
 
             final String ownerFirstName = ownerData['firstname'];
             final String ownerLastName = ownerData['lastname'];
@@ -133,24 +134,24 @@ class _CouponDetailState extends State<CouponDetail> {
                                   Text(
                                     shopName,
                                     style: TextStyle(
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 5),
+                                  const SizedBox(height: 4),
                                   Text(
                                     shopCategory,
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 5),
+                                  const SizedBox(height: 4),
                                   Text(
                                     '$shopCity, $shopState, $shopPincode',
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.white70,
                                     ),
                                   ),
@@ -160,66 +161,74 @@ class _CouponDetailState extends State<CouponDetail> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 28,
+                          fontSize: 26,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2E7D32),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Text(
                         'Category: $category',
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 14,
                           color: Colors.black54,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 4),
                       Text(
                         '$discountPercentage% OFF',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFd32f2f),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           const Icon(Icons.calendar_today,
-                              size: 20, color: Color(0xFF2E7D32)),
+                              size: 16, color: Color(0xFF2E7D32)),
                           const SizedBox(width: 8),
                           Text(
                             'Valid till: ${formatValidityDate(validTill)}',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: Colors.black54,
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        desc,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Contact Details',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2E7D32),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           const Icon(Icons.person,
                               size: 20, color: Color(0xFF386641)),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Text(
                             '$ownerFirstName $ownerLastName',
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black87),
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey.shade700),
                           ),
                         ],
                       ),
@@ -228,11 +237,11 @@ class _CouponDetailState extends State<CouponDetail> {
                         children: [
                           const Icon(Icons.phone,
                               size: 20, color: Color(0xFF386641)),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Text(
                             phoneNumber,
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.black87),
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey.shade700),
                           ),
                         ],
                       ),
@@ -248,7 +257,8 @@ class _CouponDetailState extends State<CouponDetail> {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (couponState is! CouponLoading) {
+                                    if (couponState is! CouponLoading &&
+                                        !couponData['redeemed']) {
                                       BlocProvider.of<CouponBloc>(context).add(
                                           AvailCouponEvent(couponData['_id']));
                                       BlocProvider.of<SingleCouponBloc>(context)
