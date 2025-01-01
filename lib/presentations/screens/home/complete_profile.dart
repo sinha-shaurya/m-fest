@@ -4,6 +4,8 @@ import 'package:aash_india/bloc/auth/auth_state.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/home/home_page.dart';
 import 'package:aash_india/presentations/screens/profile/waiting_approval.dart';
+import 'package:aash_india/presentations/widgets/city_autocomplete.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,6 +27,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
   final TextEditingController _zipCodeController = TextEditingController();
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
+  final LocalStorageService _localStorageService = LocalStorageService();
   String _selectedCategory = 'Electronics';
   String _selectedState = 'Bihar';
   bool _showOtherCategoryField = false;
@@ -288,20 +291,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
       ),
       child: Column(
         children: [
-          TextField(
-            controller: _cityController,
-            decoration: InputDecoration(
-              fillColor: Colors.white60,
-              filled: true,
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF386641))),
-              labelText: "City",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              prefixIcon: const Icon(Icons.location_city),
-            ),
-          ),
+          CityAutocomplete(
+              cities: _localStorageService.getCities ?? [],
+              cityController: _cityController),
           const SizedBox(
             height: 16,
           ),
@@ -443,20 +435,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
             ),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _cityController,
-            decoration: InputDecoration(
-              labelText: "City",
-              prefixIcon: const Icon(Icons.location_on),
-              fillColor: Colors.white60,
-              filled: true,
-              focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF386641))),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
+          CityAutocomplete(
+              cities: _localStorageService.getCities ?? [],
+              cityController: _cityController),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -506,8 +487,14 @@ class _CompleteProfileState extends State<CompleteProfile> {
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _selectedCategory,
-            items: ['Electronics', 'Clothes', 'Home Appliances', 'Others']
-                .map((String category) {
+            items: [
+              'Electronics',
+              'Fashion',
+              'Home Essentials',
+              'Wellness',
+              'Groceries',
+              'Others'
+            ].map((String category) {
               return DropdownMenuItem<String>(
                 value: category,
                 child: Text(category),

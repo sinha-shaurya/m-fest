@@ -1,28 +1,24 @@
 import 'dart:convert';
 import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_state.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SponsorBloc extends Bloc<SponsorEvent, SponsorState> {
   SponsorBloc() : super(SponsorInitial()) {
     on<GetAllSponsors>(_fetchAllSponsors);
   }
-
-  final String baseUrl =
-      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   Future<void> _fetchAllSponsors(
       GetAllSponsors event, Emitter<SponsorState> emit) async {
     emit(SponsorLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final selectedCity = prefs.getString('selectedCity');
-      final uri = Uri.parse('$baseUrl/api/link').replace(
+      final uri =
+          Uri.parse('${_localStorageService.getBaseUrl}/api/link').replace(
         queryParameters: {
-          'city': event.city ?? selectedCity ?? '',
+          'city': event.city ?? _localStorageService.getSelectedCity ?? '',
         },
       );
       final response = await http.get(

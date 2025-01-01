@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
-                        obscureText: _showPassword,
+                        obscureText: !_showPassword,
                         decoration: InputDecoration(
                           fillColor: Colors.white60,
                           filled: true,
@@ -142,8 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                           suffixIcon: IconButton(
                             icon: Icon(
                               !_showPassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {

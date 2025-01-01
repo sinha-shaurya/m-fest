@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -17,14 +16,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCompleteProfile>(_onProfileComplete);
     on<AuthLogoutEvent>(_onLogout);
   }
-  final String baseUrl =
-      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   Future<void> _onLoginEvent(AuthLogin event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/login'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': event.email, 'password': event.password}),
       );
@@ -35,8 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final bool isApproved = responseData['isApproved'];
         final name = responseData['name'];
         final isCustomer = responseData['type'] == 'customer';
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
+        await _localStorageService.setToken(token);
         if (isProfileCompleted) {
           if (!isCustomer && !isApproved) {
             emit(AuthNotApproved());
@@ -59,8 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogout(AuthLogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.remove('token');
+      await _localStorageService.removeToken();
       emit(AuthLogout());
     } catch (error) {
       emit(AuthFailed('Unknown error occurred.'));
@@ -72,7 +69,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/signup'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/auth/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': event.name,
@@ -96,7 +93,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/forgot-password'),
+        Uri.parse(
+            '${_localStorageService.getBaseUrl}/api/auth/forgot-password'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': event.email,
@@ -119,7 +117,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/reset-password'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/auth/reset-password'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': event.email,
@@ -145,19 +143,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthCompleteProfile event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(AuthFailed('User not authenticated'));
         return;
       }
 
       final response = await http.put(
-        Uri.parse('$baseUrl/api/auth/update-profile'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/auth/update-profile'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
         body: jsonEncode({...event.data}),
       );
@@ -182,14 +177,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthCheck event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      if (token != null) {
+      if (_localStorageService.getToken != null) {
         final response = await http.get(
-          Uri.parse('$baseUrl/api/auth/profile-data'),
+          Uri.parse('${_localStorageService.getBaseUrl}/api/auth/profile-data'),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token'
+            'Authorization': 'Bearer ${_localStorageService.getToken}'
           },
         );
         if (response.statusCode == 200) {

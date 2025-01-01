@@ -144,7 +144,7 @@ class _SignUpState extends State<SignUp> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
-                        obscureText: _showPassword,
+                        obscureText: !_showPassword,
                         decoration: InputDecoration(
                           fillColor: Colors.white60,
                           filled: true,
@@ -160,7 +160,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showPassword
+                              !_showPassword
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                               color: Colors.grey,
@@ -176,7 +176,7 @@ class _SignUpState extends State<SignUp> {
                       const SizedBox(height: 16),
                       TextField(
                         controller: _confirmPassword,
-                        obscureText: _showConfirmPassword,
+                        obscureText: !_showConfirmPassword,
                         decoration: InputDecoration(
                           fillColor: Colors.white60,
                           filled: true,
@@ -192,7 +192,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _showConfirmPassword
+                              !_showConfirmPassword
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                               color: Colors.grey,

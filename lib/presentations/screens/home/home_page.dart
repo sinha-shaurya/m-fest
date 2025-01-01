@@ -15,6 +15,7 @@ import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_event.dart';
 import 'package:aash_india/core/constants/theme.dart';
 import 'package:aash_india/presentations/screens/auth/login.dart';
+import 'package:aash_india/presentations/screens/auth/splash_screen.dart';
 import 'package:aash_india/presentations/screens/coupon/coupon_detail.dart';
 import 'package:aash_india/presentations/screens/coupon/coupons.dart';
 import 'package:aash_india/presentations/screens/coupon/manage_coupons.dart';
@@ -23,10 +24,10 @@ import 'package:aash_india/presentations/screens/sponsors/sponsor_page.dart';
 import 'package:aash_india/presentations/widgets/app_drawer.dart';
 import 'package:aash_india/presentations/widgets/banner_carousel.dart';
 import 'package:aash_india/presentations/widgets/category_item.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,18 +37,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final LocalStorageService _localStorageService = LocalStorageService();
   String activeCategory = 'All';
   bool isPartner = false;
-  String? selectedCity;
-  List<String> cities = [];
   late TextEditingController searchController;
+  late String? selectedCity;
 
   @override
   void initState() {
     BlocProvider.of<ProfileBloc>(context).add(ProfileFetchInfo());
     BlocProvider.of<AppDataBloc>(context).add(AppDataFetch());
     searchController = TextEditingController();
-    loadCities();
+    selectedCity = _localStorageService.getSelectedCity;
     _initializeState();
     super.initState();
   }
@@ -55,34 +56,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> _initializeState() async {
     if (mounted) {
       BlocProvider.of<CouponBloc>(context)
-          .add(GetAllCoupons(city: selectedCity));
-      BlocProvider.of<SponsorBloc>(context)
-          .add(GetAllSponsors(isCarousel: true, city: selectedCity));
+          .add(GetAllCoupons(city: _localStorageService.getSelectedCity));
+      BlocProvider.of<SponsorBloc>(context).add(GetAllSponsors(
+          isCarousel: true, city: _localStorageService.getSelectedCity));
     }
-    setState(() {
-      selectedCity = null;
-    });
-  }
-
-  Future<void> loadCities() async {
-    try {
-      cities = await CouponBloc().fetchCities();
-      final SharedPreferences pref = await SharedPreferences.getInstance();
-      String? city = pref.getString('selectedCity');
-      setState(() {
-        selectedCity = city ?? cities[0];
-      });
-    } catch (error) {
-      // ignore: avoid_print
-    }
-  }
-
-  setCity(String city) async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('selectedCity', city);
-    setState(() {
-      selectedCity = city;
-    });
   }
 
   @override
@@ -133,7 +110,7 @@ class _HomePageState extends State<HomePage> {
             if (state is AuthLogout) {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const SplashScreen()),
                 (Route<dynamic> route) => false,
               );
             }
@@ -161,24 +138,30 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             Text(
-              selectedCity ?? "",
+              selectedCity ?? "N/A",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF344e41),
               ),
             ),
-            cities.isNotEmpty
+            _localStorageService.getCities != null &&
+                    _localStorageService.getCities!.isNotEmpty
                 ? PopupMenuButton<String>(
                     icon: Icon(Icons.pin_drop, color: Color(0xFF344e41)),
-                    onSelected: (String newValue) {
-                      setCity(newValue);
+                    onSelected: (String city) async {
+                      setState(() {
+                        selectedCity = city;
+                      });
+
                       BlocProvider.of<CouponBloc>(context)
-                          .add(GetAllCoupons(city: newValue));
+                          .add(GetAllCoupons(city: city));
                       BlocProvider.of<SponsorBloc>(context)
-                          .add(GetAllSponsors(city: newValue));
+                          .add(GetAllSponsors(city: city));
+
+                      await _localStorageService.setSelectedCity(city);
                     },
                     itemBuilder: (BuildContext context) {
-                      return cities
+                      return _localStorageService.getCities!
                           .map((String city) => city)
                           .toList()
                           .map<PopupMenuItem<String>>((String city) {
@@ -192,16 +175,9 @@ class _HomePageState extends State<HomePage> {
                       }).toList();
                     },
                   )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('N/A'),
-                      Icon(
-                        Icons.pin_drop,
-                        color: Color(0xFF344e41),
-                      ),
-                    ],
+                : Icon(
+                    Icons.pin_drop,
+                    color: Color(0xFF344e41),
                   ),
           ],
         ),
@@ -323,7 +299,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 10),
                         BannerCarousel(
-                          city: selectedCity ?? "",
+                          city: _localStorageService.getSelectedCity ?? "",
                         ),
                         Container(
                           padding: const EdgeInsets.fromLTRB(4, 24, 4, 0),
@@ -689,11 +665,12 @@ class _HomePageState extends State<HomePage> {
               if (searchController.text.isNotEmpty) {
                 BlocProvider.of<CouponBloc>(context).add(
                   GetAllCoupons(
-                      city: selectedCity, search: searchController.text),
+                      city: _localStorageService.getSelectedCity,
+                      search: searchController.text),
                 );
               } else if (searchController.text.isEmpty) {
                 BlocProvider.of<CouponBloc>(context).add(
-                  GetAllCoupons(city: selectedCity),
+                  GetAllCoupons(city: _localStorageService.getSelectedCity),
                 );
               }
             },
@@ -713,12 +690,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  // int _getSelectedIndex(NavigationState state) {
-  //   if (state is NavigationHome) return 0;
-  //   if (state is NavigationCategories) return 1;
-  //   if (state is NavigationCoupon) return 2;
-  //   if (state is NavigationProfile) return 3;
-  //   return 0;
-  // }
 }
