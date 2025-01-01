@@ -3,9 +3,8 @@ import 'dart:developer';
 
 import 'package:aash_india/bloc/coupons/coupon_event.dart';
 import 'package:aash_india/bloc/coupons/coupon_state.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class CouponBloc extends Bloc<CouponEvent, CouponState> {
@@ -19,19 +18,15 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     on<UpdateCouponAmount>(_onUpdateCouponAmount);
     on<TransferCouponEvent>(_onTransferCoupon);
   }
-
-  final String baseUrl =
-      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   Future<List<String>> fetchCities() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/coupon/get-cities'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/coupon/get-cities'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer ${_localStorageService.getToken}',
         },
       );
       if (response.statusCode == 200) {
@@ -54,20 +49,19 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       GetAllCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final selectedCity = prefs.getString('selectedCity');
-      final token = prefs.getString('token');
       if (event.city != null) {
-        if (selectedCity == null || selectedCity != event.city) {
-          await prefs.setString('selectedState', event.city!);
+        if (_localStorageService.getSelectedCity == null ||
+            _localStorageService.getSelectedCity != event.city) {
+          await _localStorageService.setSelectedCity(event.city!);
         }
       }
-      final uri = Uri.parse('$baseUrl/api/coupon/getall?city=${event.city}&search=${event.search}');
+      final uri = Uri.parse(
+          '${_localStorageService.getBaseUrl}/api/coupon/getall?city=${event.city}&search=${event.search}');
       final response = await http.get(
         uri,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
       if (response.statusCode == 200) {
@@ -89,18 +83,15 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       GetAvailedCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         return;
       }
 
       final responseAvailed = await http.get(
-        Uri.parse('$baseUrl/api/coupon/availed'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/coupon/availed'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
       if (responseAvailed.statusCode == 200) {
@@ -116,10 +107,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         }
 
         final response = await http.get(
-          Uri.parse('$baseUrl/api/coupon/coupon-count'),
+          Uri.parse(
+              '${_localStorageService.getBaseUrl}/api/coupon/coupon-count'),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token'
+            'Authorization': 'Bearer ${_localStorageService.getToken}'
           },
         );
         int couponCount = 0;
@@ -140,19 +132,17 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       GetPartnerActiveCoupons event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(CouponFailed('Unable to fetch coupons'));
         return;
       }
 
       final responseAvailed = await http.get(
-        Uri.parse('$baseUrl/api/coupon/store-used-coupon'),
+        Uri.parse(
+            '${_localStorageService.getBaseUrl}/api/coupon/store-used-coupon'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
 
@@ -196,10 +186,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
     emit(CouponLoading());
 
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(CouponFailed('Unable to transfer coupon'));
         return;
       }
@@ -210,10 +197,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       });
 
       final response = await http.put(
-        Uri.parse('$baseUrl/api/coupon/transfer-coupon-by-number'),
+        Uri.parse(
+            '${_localStorageService.getBaseUrl}/api/coupon/transfer-coupon-by-number'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Bearer ${_localStorageService.getToken}',
         },
         body: body,
       );
@@ -238,19 +226,16 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       CheckRedeem event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(CouponFailed('Unable to fetch coupons'));
         return;
       }
 
       final responseAvailed = await http.get(
-        Uri.parse('$baseUrl/api/coupon/availed'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/coupon/availed'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
 
@@ -274,10 +259,7 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       UpdateCouponAmount event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(CouponFailed('Unable to update coupon amount'));
         return;
       }
@@ -288,10 +270,11 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       });
 
       final responseAvailed = await http.put(
-        Uri.parse('$baseUrl/api/coupon/update-amount/${event.couponId}'),
+        Uri.parse(
+            '${_localStorageService.getBaseUrl}/api/coupon/update-amount/${event.couponId}'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
         body: body,
       );
@@ -311,17 +294,16 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       AvailCouponEvent event, Emitter<CouponState> emit) async {
     emit(CouponLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      if (token == null) {
+      if (_localStorageService.getToken == null) {
         emit(CouponFailed('Unable to fetch coupons'));
         return;
       }
       final response = await http.put(
-        Uri.parse('$baseUrl/api/coupon/avail/${event.id}'),
+        Uri.parse(
+            '${_localStorageService.getBaseUrl}/api/coupon/avail/${event.id}'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
       dynamic res = await jsonDecode(response.body);
@@ -345,17 +327,16 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
       if (state is CouponLoaded && event.category != 'All') {
         coupons = (state as CouponLoaded).coupons;
       } else {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
-
-        final selectedCity = prefs.getString('selectedCity');
-        final uri = Uri.parse('$baseUrl/api/coupon/getall').replace(
-            queryParameters: {'city': selectedCity});
+        final uri =
+            Uri.parse('${_localStorageService.getBaseUrl}/api/coupon/getall')
+                .replace(queryParameters: {
+          'city': _localStorageService.getSelectedCity
+        });
         final response = await http.get(
           uri,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer ${_localStorageService.getToken}',
           },
         );
 

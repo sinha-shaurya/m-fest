@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:aash_india/bloc/profile/profile_event.dart';
 import 'package:aash_india/bloc/profile/profile_state.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,22 +11,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<ProfileFetchInfo>(_onProfileFetch);
     on<ProfileUpdateInfo>(_onProfileUpdate);
   }
-  final String baseUrl =
-      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   Future<void> _onProfileFetch(
       ProfileFetchInfo event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-
-      if (token != null) {
+      if (_localStorageService.getToken != null) {
         final response = await http.get(
-          Uri.parse('$baseUrl/api/auth/profile-data'),
+          Uri.parse('${_localStorageService.getBaseUrl}/api/auth/profile-data'),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token'
+            'Authorization': 'Bearer ${_localStorageService.getToken}'
           },
         );
         if (response.statusCode == 200) {
@@ -48,10 +44,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             ));
           } else if (userType == 'customer') {
             final response = await http.get(
-              Uri.parse('$baseUrl/api/coupon/coupon-count'),
+              Uri.parse(
+                  '${_localStorageService.getBaseUrl}/api/coupon/coupon-count'),
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token'
+                'Authorization': 'Bearer ${_localStorageService.getToken}'
               },
             );
             int couponCount = 0;
@@ -93,10 +90,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
       if (token != null) {
         final response = await http.put(
-            Uri.parse('$baseUrl/api/auth/update-profile'),
+            Uri.parse(
+                '${_localStorageService.getBaseUrl}/api/auth/update-profile'),
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token'
+              'Authorization': 'Bearer ${_localStorageService.getToken}'
             },
             body: jsonEncode({...event.data}));
         if (response.statusCode == 200) {

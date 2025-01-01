@@ -1,6 +1,6 @@
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
-import 'package:aash_india/presentations/screens/auth/login.dart';
+import 'package:aash_india/presentations/screens/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -46,7 +46,7 @@ class WaitingApproval extends StatelessWidget {
                 'Please try again later.',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: Colors.grey[300],
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -64,7 +64,7 @@ class WaitingApproval extends StatelessWidget {
                   BlocProvider.of<AuthBloc>(context).add(AuthLogoutEvent());
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (context) => const HomePage()),
                   );
                 },
                 child: Text(

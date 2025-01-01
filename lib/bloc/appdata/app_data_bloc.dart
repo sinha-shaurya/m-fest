@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:aash_india/bloc/appdata/app_data_event.dart';
 import 'package:aash_india/bloc/appdata/app_data_state.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class AppDataBloc extends Bloc<AppDataEvent, AppDataState> {
@@ -10,15 +10,14 @@ class AppDataBloc extends Bloc<AppDataEvent, AppDataState> {
     on<AppDataFetch>(_onDataFetch);
   }
 
-  final String baseUrl =
-      dotenv.get('BASE_URL', fallback: 'http://10.0.2.2:5000');
+  final LocalStorageService _localStorageService = LocalStorageService();
 
   Future<void> _onDataFetch(
       AppDataEvent event, Emitter<AppDataState> emit) async {
     emit(AppDataLoading());
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/info'),
+        Uri.parse('${_localStorageService.getBaseUrl}/api/info'),
         headers: {
           'Content-Type': 'application/json',
         },

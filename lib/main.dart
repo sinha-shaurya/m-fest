@@ -5,13 +5,16 @@ import 'package:aash_india/bloc/navigation/navigation_bloc.dart';
 import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_bloc.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
+import 'package:aash_india/services/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'presentations/screens/auth/splash_screen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  await LocalStorageService().initialize();
   runApp(const MyApp());
 }
 
@@ -26,7 +29,6 @@ class MyApp extends StatelessWidget {
         BlocProvider<ProfileBloc>(create: (context) => ProfileBloc()),
         BlocProvider<CouponBloc>(create: (context) => CouponBloc()),
         BlocProvider<SingleCouponBloc>(create: (context) => SingleCouponBloc()),
-        BlocProvider<CouponBloc>(create: (context) => CouponBloc()),
         BlocProvider<SponsorBloc>(create: (context) => SponsorBloc()),
         BlocProvider<AppDataBloc>(create: (context) => AppDataBloc()),
       ],
