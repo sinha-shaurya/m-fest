@@ -485,7 +485,8 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   const SizedBox(height: 2),
                                                   Text(
-                                                    coupon['ownerAddress'],
+                                                    coupon['ownerAddress'] ??
+                                                        '',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 8,
@@ -684,7 +685,11 @@ class _HomePageState extends State<HomePage> {
                     bottomRight: Radius.circular(100)),
               ),
             ),
-            child: Icon(Icons.search),
+            child: Icon(
+              Icons.search,
+              size: 24,
+              color: Colors.white,
+            ),
           ),
         ],
       ),

@@ -59,11 +59,13 @@ class _ManageCouponsState extends State<ManageCoupons>
               child: BlocBuilder<CouponBloc, CouponState>(
                 builder: (context, state) {
                   if (state is CouponLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                            color: Color(0xFF344e41)));
                   } else if (state is ManageCouponLoaded) {
                     final activeCoupons = state.coupons
                         .where((coupon) =>
-                            coupon['couponDetail'][0]['status'] == 'REDEEMED')
+                            coupon['couponDetail']['status'] == 'REDEEMED')
                         .toList();
                     return buildCouponList(coupons: activeCoupons);
                   } else if (state is CouponFailed) {
@@ -80,11 +82,14 @@ class _ManageCouponsState extends State<ManageCoupons>
               child: BlocBuilder<CouponBloc, CouponState>(
                 builder: (context, state) {
                   if (state is CouponLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator(
+                      color: Color(0xFF344e41),
+                    ));
                   } else if (state is ManageCouponLoaded) {
                     final unbilledCoupons = state.coupons
                         .where((coupon) =>
-                            coupon['couponDetail'][0]['status'] == 'ACTIVE')
+                            coupon['couponDetail']['status'] == 'ACTIVE')
                         .toList();
                     return buildCouponList(coupons: unbilledCoupons);
                   } else if (state is CouponFailed) {
@@ -116,25 +121,26 @@ class _ManageCouponsState extends State<ManageCoupons>
         return Card(
           margin: const EdgeInsets.all(10.0),
           child: ListTile(
-            trailing: coupon['couponDetail'][0]['status'] == 'ACTIVE'
+            trailing: coupon['couponDetail']['status'] == 'ACTIVE'
                 ? IconButton(
                     onPressed: () {
                       _showAddAmountDialog(
-                          context,
-                          coupon['couponDetail'][0]['_id'],
-                          coupon['consumerData']['id']);
+                        context,
+                        coupon['couponDetail']['_id'],
+                        coupon['consumerData']['id'],
+                      );
                     },
                     icon: const Icon(Icons.keyboard_double_arrow_right),
                   )
                 : const SizedBox(),
             title: Text(
-              coupon['consumerData']['firstname'] +
-                  " " +
-                  (coupon['consumerData']['lastname'] ?? 'Unknown'),
+              "${coupon['consumerData']['firstname']} ${coupon['consumerData']['lastname'] ?? 'Unknown'}",
             ),
-            subtitle: Text(coupon['couponDetail'][0]['status'] == 'REDEEMED'
-                ? 'REDEEMED'
-                : "₹${coupon['couponDetail'][0]['totalPrice']}"),
+            subtitle: Text(
+              coupon['couponDetail']['status'] == 'REDEEMED'
+                  ? 'REDEEMED'
+                  : "₹${coupon['couponDetail']['totalPrice']}",
+            ),
           ),
         );
       },
@@ -142,7 +148,10 @@ class _ManageCouponsState extends State<ManageCoupons>
   }
 
   void _showAddAmountDialog(
-      BuildContext context, String couponId, String consumerId) {
+    BuildContext context,
+    String couponId,
+    String consumerId,
+  ) {
     final TextEditingController amountController = TextEditingController();
 
     showDialog(
@@ -163,6 +172,14 @@ class _ManageCouponsState extends State<ManageCoupons>
               child: const Text('Cancel'),
             ),
             ElevatedButton(
+              style: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(
+                  Colors.white,
+                ),
+                backgroundColor: WidgetStatePropertyAll(
+                  Color(0xFF344e41),
+                ),
+              ),
               onPressed: () {
                 String enteredAmount = amountController.text;
                 context.read<CouponBloc>().add(

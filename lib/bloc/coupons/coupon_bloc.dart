@@ -159,17 +159,17 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
               "phonenumber": coupon["consumerData"]["phonenumber"],
               "city": coupon["consumerData"]["city"],
               "state": coupon["consumerData"]["state"],
-              "pincode": coupon["consumerData"]["pincode"]
+              "pincode": coupon["consumerData"]["pincode"],
+              "_id": coupon["consumerData"]["_id"],
             },
-            "couponDetail": coupon["couponDetail"].map((detail) {
-              return {
-                "couponId": detail["couponId"],
-                "status": detail["status"],
-                "totalPrice": detail["totalPrice"],
-                "_id": detail["_id"],
-                "dateAdded": detail["dateAdded"]
-              };
-            }).toList()
+            "couponDetail": {
+              "couponId": coupon["couponDetail"]["couponId"],
+              "status": coupon["couponDetail"]["status"],
+              "totalPrice": coupon["couponDetail"]["totalPrice"],
+              "_id": coupon["couponDetail"]["_id"],
+              "dateAdded": coupon["couponDetail"]["dateAdded"],
+              "ownerAddress": coupon["couponDetail"]["ownerAddress"],
+            },
           };
         }).toList();
         emit(ManageCouponLoaded(couponList));

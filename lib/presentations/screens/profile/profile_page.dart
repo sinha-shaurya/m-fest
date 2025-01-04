@@ -26,7 +26,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool isOtherCategory = false;
   bool _showQRCode = false;
-
+  final GlobalKey _qrKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -73,6 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildProfileImage(state.gender == 'Male'),
+                    SizedBox(height: state.type == 'partner' ? 10 : 0),
                     state.type == 'partner'
                         ? ElevatedButton(
                             style: ButtonStyle(
@@ -93,14 +94,28 @@ class _ProfilePageState extends State<ProfilePage> {
                         : SizedBox(),
                     const SizedBox(height: 20),
                     if (_showQRCode)
-                      Container(
-                        decoration: _boxDecoration(),
-                        child: QrImageView(
-                          data: state.id,
-                          version: QrVersions.auto,
-                          size: 200.0,
+                      RepaintBoundary(
+                        key: _qrKey,
+                        child: Container(
+                          decoration: _boxDecoration(),
+                          child: QrImageView(
+                            data: state.id,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                          ),
                         ),
                       ),
+                    // const SizedBox(height: 20),
+                    // if (_showQRCode)
+                    //   ElevatedButton(
+                    //     style: ButtonStyle(
+                    //       foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    //       backgroundColor:
+                    //           WidgetStatePropertyAll(const Color(0xFF386641)),
+                    //     ),
+                    //     onPressed: () => _saveQRCodeToGallery(context),
+                    //     child: const Text('Download QR Code'),
+                    //   ),
                     const SizedBox(height: 20),
                     _buildCouponAvailable(int.parse(state.coupons ?? '0')),
                     const SizedBox(height: 20),
@@ -185,6 +200,32 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+  // Future<void> _saveQRCodeToGallery(BuildContext context) async {
+  //   try {
+  //     final RenderRepaintBoundary boundary =
+  //         _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  //     final ui.Image image = await boundary.toImage();
+  //     final ByteData? byteData =
+  //         await image.toByteData(format: ui.ImageByteFormat.png);
+  //     final Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+  //     final result = await ImageGallerySaver.saveImage(pngBytes);
+  //     if (result['isSuccess']) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('QR Code saved to gallery!')),
+  //       );
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Failed to save QR Code.')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error: $e')),
+  //     );
+  //   }
+  // }
 
   Widget _buildProfileImage(bool male) {
     return Container(

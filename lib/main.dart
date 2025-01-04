@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<AppDataBloc>(create: (context) => AppDataBloc()),
       ],
       child: MaterialApp(
+        title: 'Mfest',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-              shadowColor: Colors.black.withOpacity(0.5),
+              shadowColor: Colors.black.withValues(alpha: 0.5),
             ),
           ),
           inputDecorationTheme: const InputDecorationTheme(
