@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:ui' as ui;
+
 import 'package:aash_india/bloc/auth/auth_bloc.dart';
 import 'package:aash_india/bloc/auth/auth_event.dart';
 import 'package:aash_india/bloc/auth/auth_state.dart';
@@ -13,7 +16,10 @@ import 'package:aash_india/presentations/screens/profile/info_tile.dart';
 import 'package:aash_india/presentations/widgets/how_it_works.dart';
 import 'package:aash_india/presentations/widgets/privacy_policy.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -27,6 +33,41 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isOtherCategory = false;
   bool _showQRCode = false;
   final GlobalKey _qrKey = GlobalKey();
+
+  Future<void> _saveQrCode() async {
+    try {
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        await Permission.storage.request();
+      }
+
+      final boundary =
+          _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage();
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final imageBytes = byteData!.buffer.asUint8List();
+
+      final result = await ImageGallerySaverPlus.saveImage(imageBytes);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['isSuccess']
+              ? 'QR Code saved to gallery!'
+              : 'Failed to save QR Code'),
+          backgroundColor: result['isSuccess'] ? Colors.green : Colors.red,
+        ),
+      );
+    } catch (e) {
+      log(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving QR Code'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -105,17 +146,19 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                    // const SizedBox(height: 20),
-                    // if (_showQRCode)
-                    //   ElevatedButton(
-                    //     style: ButtonStyle(
-                    //       foregroundColor: WidgetStatePropertyAll(Colors.white),
-                    //       backgroundColor:
-                    //           WidgetStatePropertyAll(const Color(0xFF386641)),
-                    //     ),
-                    //     onPressed: () => _saveQRCodeToGallery(context),
-                    //     child: const Text('Download QR Code'),
-                    //   ),
+                    if (_showQRCode) const SizedBox(height: 10),
+                    if (_showQRCode)
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          foregroundColor:
+                              WidgetStatePropertyAll(Color(0xFF386641)),
+                          backgroundColor: WidgetStatePropertyAll(
+                            Colors.white60,
+                          ),
+                        ),
+                        onPressed: _saveQrCode,
+                        child: Text('Download QR Code'),
+                      ),
                     const SizedBox(height: 20),
                     _buildCouponAvailable(int.parse(state.coupons ?? '0')),
                     const SizedBox(height: 20),
@@ -201,32 +244,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Future<void> _saveQRCodeToGallery(BuildContext context) async {
-  //   try {
-  //     final RenderRepaintBoundary boundary =
-  //         _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-  //     final ui.Image image = await boundary.toImage();
-  //     final ByteData? byteData =
-  //         await image.toByteData(format: ui.ImageByteFormat.png);
-  //     final Uint8List pngBytes = byteData!.buffer.asUint8List();
-
-  //     final result = await ImageGallerySaver.saveImage(pngBytes);
-  //     if (result['isSuccess']) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('QR Code saved to gallery!')),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Failed to save QR Code.')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error: $e')),
-  //     );
-  //   }
-  // }
-
   Widget _buildProfileImage(bool male) {
     return Container(
       padding: const EdgeInsets.all(4),
@@ -238,7 +255,6 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.circular(100),
         child: Image.asset(
           'assets/Unknown_person.jpg',
-          // male ? 'assets/man.jpeg' : 'assets/woman.jpeg',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           height: 165,
