@@ -62,10 +62,6 @@ ThemeData appTheme(BuildContext context) {
         borderRadius: BorderRadius.circular(8.0),
         borderSide: const BorderSide(color: AppColors.primaryColor),
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8.0),
-        borderSide: BorderSide(color: AppColors.primaryColor.withOpacity(0.5)),
-      ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.0),
         borderSide: const BorderSide(color: AppColors.primaryColor, width: 2.0),

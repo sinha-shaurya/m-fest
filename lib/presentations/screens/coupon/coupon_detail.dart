@@ -81,11 +81,11 @@ class _CouponDetailState extends State<CouponDetail> {
             final String ownerFirstName = ownerData['firstname'];
             final String ownerLastName = ownerData['lastname'];
             final String phoneNumber = ownerData['phonenumber'];
-            final String shopName = ownerData['shop_name'];
-            final String shopCategory = ownerData['shop_category'];
-            final String shopCity = ownerData['shop_city'];
-            final String shopState = ownerData['shop_state'];
-            final String shopPincode = ownerData['shop_pincode'];
+            final String shopName = ownerData['shop_name'] ?? '';
+            final String shopCategory = ownerData['shop_category'] ?? '';
+            final String shopCity = ownerData['shop_city'] ?? '';
+            final String shopState = ownerData['shop_state'] ?? '';
+            final String shopPincode = ownerData['shop_pincode'] ?? '';
 
             return Padding(
               padding: const EdgeInsets.all(16.0),

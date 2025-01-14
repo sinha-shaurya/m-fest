@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "814597562439",
+    "project_id": "mfest-12e8c",
+    "storage_bucket": "mfest-12e8c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814597562439:android:4a2068225fcac41503d162",
+        "android_client_info": {
+          "package_name": "com.mfest.aash_india"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADrlvLbm_bApoLlv03clvrMLbJsaNNUHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
