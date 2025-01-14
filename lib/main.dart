@@ -6,13 +6,25 @@ import 'package:aash_india/bloc/profile/profile_bloc.dart';
 import 'package:aash_india/bloc/singleCoupon/single_coupon_bloc.dart';
 import 'package:aash_india/bloc/sponsors/sponsors_bloc.dart';
 import 'package:aash_india/services/local_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'firebase_options.dart';
 import 'presentations/screens/auth/splash_screen.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await dotenv.load(fileName: ".env");
   await LocalStorageService().initialize();
   runApp(const MyApp());
