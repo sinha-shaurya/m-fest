@@ -15,7 +15,6 @@ class LocalStorageService {
   List<String>? _cities;
   String? _baseUrl;
 
-  // initialization
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     _token = _prefs?.getString('token');
@@ -24,13 +23,11 @@ class LocalStorageService {
     await loadCities();
   }
 
-  // Getters
   String? get getToken => _token;
   String? get getSelectedCity => _selectedCity;
   String? get getBaseUrl => _baseUrl;
   List<String>? get getCities => _cities;
 
-  // Setters
   Future<void> setToken(String value) async {
     _token = value;
     await _prefs?.setString('token', value);
@@ -46,7 +43,11 @@ class LocalStorageService {
     await _prefs?.remove('token');
   }
 
-  // static functions
+  Future<void> removeSelectedCity() async {
+    _selectedCity = null;
+    await _prefs?.remove('selectedCity');
+  }
+
   Future<void> loadCities() async {
     try {
       final response = await http.get(

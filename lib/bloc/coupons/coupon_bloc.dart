@@ -55,15 +55,28 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
           await _localStorageService.setSelectedCity(event.city!);
         }
       }
-      final uri = Uri.parse(
-          '${_localStorageService.getBaseUrl}/api/coupon/getall?city=${event.city}&search=${event.search}');
+
+      final uri =
+          Uri.parse('${_localStorageService.getBaseUrl}/api/coupon/getall');
+
+      final Map<String, String> queryParameters = {};
+      if (event.city != null) {
+        queryParameters['city'] = event.city!;
+      }
+      if (event.search != null) {
+        queryParameters['search'] = event.search!;
+      }
+
+      final finalUri = uri.replace(queryParameters: queryParameters);
+
       final response = await http.get(
-        uri,
+        finalUri,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${_localStorageService.getToken}'
         },
       );
+
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
         final List<Map<String, dynamic>> coupons =
@@ -73,6 +86,9 @@ class CouponBloc extends Bloc<CouponEvent, CouponState> {
         } else {
           emit(CouponLoaded(coupons.reversed.toList()));
         }
+      } else {
+        emit(CouponFailed(
+            'Failed to load coupons. Status code: ${response.statusCode}'));
       }
     } catch (error) {
       emit(CouponFailed('Unknown error occurred.'));
