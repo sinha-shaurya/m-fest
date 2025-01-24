@@ -77,7 +77,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(ProfileFailed(''));
       }
     } catch (error) {
-      emit(ProfileFailed('Unknown error occurred.'));
+      emit(ProfileFailed(''));
     }
   }
 

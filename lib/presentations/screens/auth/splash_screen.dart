@@ -64,9 +64,7 @@ class SplashScreenState extends State<SplashScreen> {
 
   Future<void> _handleInitialMessage() async {
     await FirebaseMessaging.instance.getInitialMessage().then((message) {
-      if (message != null) {
-        // Handle initial message
-      }
+      if (message != null) {}
     });
   }
 

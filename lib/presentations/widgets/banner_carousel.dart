@@ -67,15 +67,26 @@ class BannerCarouselState extends State<BannerCarousel> {
                             children: [
                               CircularProgressIndicator(
                                 value: progress,
-                                backgroundColor:
-                                    Colors.grey, // Full progress color
+                                backgroundColor: Colors.grey,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.grey.shade800), // Progress color
+                                    Colors.grey.shade800),
                               ),
                             ],
                           ),
                         );
                       }
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 220,
+                        width: 220,
+                        color: Colors.grey.shade200,
+                        child: const Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                          size: 50,
+                        ),
+                      );
                     },
                   );
                 },
@@ -87,8 +98,8 @@ class BannerCarouselState extends State<BannerCarousel> {
                   enableInfiniteScroll: true,
                   reverse: false,
                   autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 3),
-                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  autoPlayInterval: const Duration(seconds: 3),
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
                   enlargeCenterPage: true,
                   enlargeFactor: 0.3,
